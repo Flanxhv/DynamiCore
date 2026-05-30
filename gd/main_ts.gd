@@ -85,7 +85,7 @@ func _ready():
 	spawn_lead_time = max(2.0, required_lead_time)
 	if Global.current_song_data.is_empty():
 		print("沒有歌曲資料！退回主選單...")
-		get_tree().change_scene_to_file("res://MainMenu.tscn")
+		get_tree().change_scene_to_file("uid://dnda82ibqdnuq")
 		return
 	
 	# ★ 處理背景圖與亮度
@@ -921,7 +921,8 @@ func _on_restart_button_pressed():
 	Transition.reload_scene()
 
 func _on_quit_button_pressed():
-	Transition.change_scene("res://SongSelect.tscn")
+	#back to Song Select
+	Transition.change_scene("uid://dcrdq7tlb21h")
 
 func _play_ap_animation():
 	# 1. 初始化狀態

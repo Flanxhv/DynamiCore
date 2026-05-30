@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://3faac22k1tal"]
 
-[ext_resource type="Script" uid="uid://1cnpe78hlngw" path="res://main_ts.gd" id="1_1bvp3"]
-[ext_resource type="PackedScene" uid="uid://cjbg0rl2pnsl1" path="res://Note.tscn" id="2_lquwl"]
+[ext_resource type="Script" uid="uid://1cnpe78hlngw" path="res://gd/main_ts.gd" id="1_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://cjbg0rl2pnsl1" path="res://tscn/Note.tscn" id="2_lquwl"]
 [ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="4_272bh"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="5_lquwl"]
-[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://BgParticles.tscn" id="6_7mycd"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="6_7mycd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquwl"]
 bg_color = Color(0, 0, 0, 1)

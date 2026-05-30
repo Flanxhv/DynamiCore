@@ -173,7 +173,7 @@ func _create_diamond_menu():
 		if preview_player.playing:
 			preview_player.stop()
 		Global.current_song_data = current_selected_song
-		Transition.change_scene("res://main.tscn")
+		Transition.change_scene("uid://3faac22k1tal")
 	)
 	
 	# PLAY 按鈕給予常駐的高亮綠色
@@ -560,7 +560,7 @@ func _create_single_diff_btn(diff_raw: String) -> Button:
 func _on_back_button_pressed():
 	if preview_player.playing:
 		preview_player.stop()
-	Transition.change_scene("res://MainMenu.tscn")
+	Transition.change_scene("uid://dnda82ibqdnuq")
 
 func _scan_local_songs():
 	# ... (維持原樣) ...

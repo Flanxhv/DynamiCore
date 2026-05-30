@@ -9,8 +9,8 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	# 載入音效檔案 (請替換成你實際的音效檔路徑)
-	click_player.stream = preload("res://Songs/click.wav")
-	hover_player.stream = preload("res://Songs/hover.wav")
+	click_player.stream = preload("uid://bifhqxn2b6i17")
+	hover_player.stream = preload("uid://8qh5srpry2x2")
 	
 	# (可選) 如果你有使用音訊匯流排，可以指定到 UI 軌道
 	# click_player.bus = "UI"

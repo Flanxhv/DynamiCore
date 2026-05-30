@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://dnda82ibqdnuq"]
 
-[ext_resource type="Script" uid="uid://3mlbe03uukac" path="res://main_menu.gd" id="1_i26rj"]
+[ext_resource type="Script" uid="uid://3mlbe03uukac" path="res://gd/main_menu.gd" id="1_i26rj"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_eiy7p"]
-[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://BgParticles.tscn" id="2_h7a2f"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_h7a2f"]
 
 [node name="MainMenu" type="Control" unique_id=620197947]
 layout_mode = 3

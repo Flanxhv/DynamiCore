@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://vo74jk8d8m7r"]
 
-[ext_resource type="Script" uid="uid://f8fsmwqvvj1h" path="res://chart_download.gd" id="1_1brwb"]
-[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://BgParticles.tscn" id="2_yqv7i"]
+[ext_resource type="Script" uid="uid://f8fsmwqvvj1h" path="res://gd/chart_download.gd" id="1_1brwb"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_yqv7i"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="3_tqst5"]
 
 [node name="ChartDownload" type="Control" unique_id=1035686107]

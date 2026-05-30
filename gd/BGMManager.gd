@@ -7,7 +7,7 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	# ★ 請把這裡換成你的音樂檔案路徑 (推薦使用 .ogg 格式)
-	bgm_player.stream = preload("res://Songs/BGM_menu.mp3")
+	bgm_player.stream = preload("uid://b47ibaujyt07s")
 	
 	add_child(bgm_player)
 

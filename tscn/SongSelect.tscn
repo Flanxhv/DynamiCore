@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dcrdq7tlb21h"]
 
-[ext_resource type="Script" uid="uid://chcrmauxgfnc8" path="res://song_select.gd" id="1_khapw"]
+[ext_resource type="Script" uid="uid://chcrmauxgfnc8" path="res://gd/song_select.gd" id="1_khapw"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_ijodb"]
 [ext_resource type="LabelSettings" uid="uid://dph0fjunkk5ps" path="res://tres/label_settings.tres" id="3_nh5sm"]
 [ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="4_u18oy"]

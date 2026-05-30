@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dap52n7jsrtn5"]
 
-[ext_resource type="Script" uid="uid://dfghq32cj1knx" path="res://download_card.gd" id="1_o40j8"]
-[ext_resource type="Texture2D" uid="uid://dotkfj0b8brb" path="res://Songs/thumb_set.png" id="2_f5vjx"]
+[ext_resource type="Script" uid="uid://dfghq32cj1knx" path="res://gd/download_card.gd" id="1_o40j8"]
+[ext_resource type="Texture2D" uid="uid://dotkfj0b8brb" path="res://sounds/thumb_set.png" id="2_f5vjx"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="3_e2fgw"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_5dtx1"]

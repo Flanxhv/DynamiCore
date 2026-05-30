@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://ca6jryylwq51b"]
 
-[ext_resource type="Script" uid="uid://c7fwk8bm8eyvg" path="res://title_screen.gd" id="1_v6p8y"]
+[ext_resource type="Script" uid="uid://c7fwk8bm8eyvg" path="res://gd/title_screen.gd" id="1_v6p8y"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_ak2if"]
-[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://BgParticles.tscn" id="2_ig5kc"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_ig5kc"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ak2if"]
 font = ExtResource("2_ak2if")

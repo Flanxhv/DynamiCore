@@ -5,7 +5,8 @@ extends Control
 @onready var back_button = $BackButton
 @onready var search_box = $SearchBox
 
-var card_scene = preload("res://DownloadCard.tscn")
+#download card
+var card_scene = preload("uid://dap52n7jsrtn5")
 var all_cloud_songs: Array = []
 
 # ★ 效能救星：設定畫面最多只生成 50 張卡片
@@ -17,7 +18,7 @@ func _ready():
 	
 	# 綁定返回按鈕
 	back_button.pressed.connect(func():
-		Transition.change_scene("res://MainMenu.tscn")
+		Transition.change_scene("uid://dnda82ibqdnuq")
 	)
 	
 	if search_box:
