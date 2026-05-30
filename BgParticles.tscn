@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cxrp220owltfb"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3dnrr"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(960, 540, 1)
+gravity = Vector3(0, -25, 0)
+scale_min = 5.0
+scale_max = 20.0
+color = Color(0.3491902, 0.91824496, 0.89165515, 0.629)
+
+[node name="BgParticles" type="GPUParticles2D" unique_id=349948908]
+position = Vector2(960, 540)
+amount = 60
+lifetime = 15.0
+preprocess = 15.0
+process_material = SubResource("ParticleProcessMaterial_3dnrr")

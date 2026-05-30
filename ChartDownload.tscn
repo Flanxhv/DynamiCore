@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://vo74jk8d8m7r"]
+
+[ext_resource type="Script" uid="uid://f8fsmwqvvj1h" path="res://chart_download.gd" id="1_1brwb"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://BgParticles.tscn" id="2_yqv7i"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="3_tqst5"]
+
+[node name="ChartDownload" type="Control" unique_id=1035686107]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1brwb")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1346743791]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.82400006)
+
+[node name="BgParticles" parent="." unique_id=349948908 instance=ExtResource("2_yqv7i")]
+amount = 90
+
+[node name="SearchBox" type="LineEdit" parent="." unique_id=394653337]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.22135417
+anchor_top = 0.019444445
+anchor_right = 0.5229168
+anchor_bottom = 0.11018518
+theme_override_fonts/font = ExtResource("3_tqst5")
+theme_override_font_sizes/font_size = 50
+placeholder_text = "  Search......"
+metadata/_edit_use_anchors_ = true
+
+[node name="BackButton" type="Button" parent="." unique_id=314413068]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0234375
+anchor_top = 0.019444445
+anchor_right = 0.1796875
+anchor_bottom = 0.11018518
+theme_override_fonts/font = ExtResource("3_tqst5")
+theme_override_font_sizes/font_size = 50
+text = "Back"
+metadata/_edit_use_anchors_ = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1094581220]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 143.0
+offset_right = 1897.0
+offset_bottom = 1039.0
+vertical_scroll_mode = 0
+
+[node name="ListContainer" type="HBoxContainer" parent="ScrollContainer" unique_id=1178557447]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CloudDownloader" type="HTTPRequest" parent="." unique_id=9915109]

@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://ca6jryylwq51b"]
+
+[ext_resource type="Script" uid="uid://c7fwk8bm8eyvg" path="res://title_screen.gd" id="1_v6p8y"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_ak2if"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://BgParticles.tscn" id="2_ig5kc"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ak2if"]
+font = ExtResource("2_ak2if")
+font_size = 100
+font_color = Color(0.5254902, 1, 1, 1)
+outline_size = 7
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 15
+shadow_color = Color(0, 0, 0, 1)
+
+[node name="TitleScreen" type="Control" unique_id=343611128]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_v6p8y")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=143476355]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.87070966, 0.8707098, 0.87070966, 1)
+
+[node name="BgParticles" parent="." unique_id=349948908 instance=ExtResource("2_ig5kc")]
+
+[node name="Label" type="Label" parent="." unique_id=1720615190]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.32864583
+anchor_top = 0.7625
+anchor_right = 0.6713542
+anchor_bottom = 0.88935184
+offset_left = 11.5
+offset_right = -11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "TAP to START"
+label_settings = SubResource("LabelSettings_ak2if")
+metadata/_edit_use_anchors_ = true
+
+[node name="Button" type="Button" parent="." unique_id=599861058]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -800.0
+offset_top = -1069.0
+offset_right = 800.0
+grow_horizontal = 2
+grow_vertical = 0
+flat = true
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

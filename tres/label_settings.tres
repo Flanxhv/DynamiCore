@@ -1,0 +1,8 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://dph0fjunkk5ps"]
+
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="1_x2iip"]
+
+[resource]
+font = ExtResource("1_x2iip")
+font_size = 40
+outline_color = Color(0, 0, 0, 1)

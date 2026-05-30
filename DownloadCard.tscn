@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://dap52n7jsrtn5"]
+
+[ext_resource type="Script" uid="uid://dfghq32cj1knx" path="res://download_card.gd" id="1_o40j8"]
+[ext_resource type="Texture2D" uid="uid://dotkfj0b8brb" path="res://Songs/thumb_set.png" id="2_f5vjx"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="3_e2fgw"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_5dtx1"]
+font = ExtResource("3_e2fgw")
+font_size = 30
+
+[sub_resource type="LabelSettings" id="LabelSettings_f4s7o"]
+font = ExtResource("3_e2fgw")
+font_size = 25
+
+[sub_resource type="LabelSettings" id="LabelSettings_ejpmi"]
+font = ExtResource("3_e2fgw")
+font_size = 25
+
+[sub_resource type="LabelSettings" id="LabelSettings_q75sj"]
+font = ExtResource("3_e2fgw")
+font_size = 35
+font_color = Color(1, 1, 0.3055162, 1)
+outline_size = 14
+outline_color = Color(0.22971639, 0.42674685, 0.5451485, 1)
+
+[node name="DownloadCard" type="ColorRect" unique_id=373810972]
+custom_minimum_size = Vector2(750, 400)
+offset_top = 215.0
+offset_right = 750.0
+offset_bottom = 615.0
+mouse_filter = 2
+color = Color(0.07444572, 0.07444573, 0.07444569, 0.8)
+script = ExtResource("1_o40j8")
+
+[node name="CoverImage" type="TextureRect" parent="." unique_id=1001565120]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 61.0
+offset_right = 402.0
+offset_bottom = 277.0
+texture = ExtResource("2_f5vjx")
+stretch_mode = 6
+
+[node name="TitleLabel" type="Label" parent="." unique_id=651880960]
+clip_contents = true
+layout_mode = 0
+offset_left = 414.0
+offset_top = 61.0
+offset_right = 725.0
+offset_bottom = 106.0
+text = "Title"
+label_settings = SubResource("LabelSettings_5dtx1")
+
+[node name="ArtistLabel" type="Label" parent="." unique_id=984830705]
+clip_contents = true
+layout_mode = 0
+offset_left = 414.0
+offset_top = 111.0
+offset_right = 725.0
+offset_bottom = 156.0
+text = "Artist"
+label_settings = SubResource("LabelSettings_f4s7o")
+
+[node name="CharterLabel" type="Label" parent="." unique_id=1319201149]
+clip_contents = true
+layout_mode = 0
+offset_left = 414.0
+offset_top = 180.0
+offset_right = 725.0
+offset_bottom = 225.0
+text = "Charter"
+label_settings = SubResource("LabelSettings_ejpmi")
+
+[node name="RankedLabel" type="Label" parent="." unique_id=1511277426]
+layout_mode = 0
+offset_left = 713.0
+offset_top = 5.0
+offset_right = 744.0
+offset_bottom = 50.0
+text = "R"
+label_settings = SubResource("LabelSettings_q75sj")
+
+[node name="DiffContainer" type="HBoxContainer" parent="." unique_id=1879500700]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 312.0
+offset_right = 88.0
+offset_bottom = 371.0
+theme_override_constants/separation = 8
+
+[node name="DownloadBtn" type="Button" parent="." unique_id=905664329]
+layout_mode = 0
+offset_left = 549.0
+offset_top = 322.0
+offset_right = 720.0
+offset_bottom = 380.0
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("3_e2fgw")
+theme_override_font_sizes/font_size = 26
+text = "Download"

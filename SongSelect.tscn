@@ -1,0 +1,481 @@
+[gd_scene format=3 uid="uid://dcrdq7tlb21h"]
+
+[ext_resource type="Script" uid="uid://chcrmauxgfnc8" path="res://song_select.gd" id="1_khapw"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_ijodb"]
+[ext_resource type="LabelSettings" uid="uid://dph0fjunkk5ps" path="res://tres/label_settings.tres" id="3_nh5sm"]
+[ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="4_u18oy"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_225vo"]
+font = ExtResource("4_u18oy")
+font_size = 100
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ijodb"]
+bg_color = Color(0.07016479, 0.07016479, 0.07016479, 0.91800004)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_bottom_right = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nh5sm"]
+bg_color = Color(0.07016479, 0.07016479, 0.07016479, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_bottom_right = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u18oy"]
+bg_color = Color(0.16007765, 0.16007765, 0.16007765, 0.91800004)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_bottom_right = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_nh5sm"]
+font = ExtResource("2_ijodb")
+font_size = 50
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_u18oy"]
+font = ExtResource("2_ijodb")
+font_size = 50
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hms2r"]
+font = ExtResource("2_ijodb")
+font_size = 50
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hms2r"]
+bg_color = Color(0.3083999, 0.30839992, 0.30839977, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="SongSelect" type="Control" unique_id=2106416534]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_khapw")
+
+[node name="Backgrond" type="ColorRect" parent="." unique_id=532812660]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.795)
+
+[node name="BgCover" type="TextureRect" parent="." unique_id=818441308]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ColorRect" type="ColorRect" parent="BgCover" unique_id=1163055499]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="ScrollBg" type="ColorRect" parent="." unique_id=1462002924]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.063541666
+anchor_top = 0.15185185
+anchor_right = 0.4984375
+anchor_bottom = 0.82222223
+offset_bottom = -18.0
+color = Color(0.31431612, 0.31431612, 0.31431603, 0.64705884)
+metadata/_edit_use_anchors_ = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1315450014]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.063541666
+anchor_top = 0.15185185
+anchor_right = 0.4984375
+anchor_bottom = 0.8055556
+follow_focus = true
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer" unique_id=2000552319]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DifficultyBox" type="VBoxContainer" parent="." unique_id=1325995639]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.06458333
+anchor_top = 0.8518519
+anchor_right = 0.2703125
+anchor_bottom = 0.9527778
+offset_left = -2.0
+offset_top = -6.1035156e-05
+offset_right = -2.0
+metadata/_edit_use_anchors_ = true
+
+[node name="BackButton" type="Button" parent="." unique_id=243551692]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0234375
+anchor_top = 0.019444445
+anchor_right = 0.1796875
+anchor_bottom = 0.11018518
+theme_override_fonts/font = ExtResource("2_ijodb")
+theme_override_font_sizes/font_size = 50
+text = "Back"
+metadata/_edit_use_anchors_ = true
+
+[node name="OpenSettingsBotton" type="Button" parent="." unique_id=1336469535]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.8197917
+anchor_top = 0.019444445
+anchor_right = 0.9760417
+anchor_bottom = 0.11018518
+theme_override_fonts/font = ExtResource("2_ijodb")
+theme_override_font_sizes/font_size = 50
+text = "Settings"
+metadata/_edit_use_anchors_ = true
+
+[node name="HighScoreLabel" type="Label" parent="." unique_id=1950485498]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.6203125
+anchor_top = 0.79907405
+anchor_right = 0.9791667
+anchor_bottom = 0.9759259
+offset_top = -25.0
+offset_bottom = -25.0
+label_settings = SubResource("LabelSettings_225vo")
+horizontal_alignment = 2
+vertical_alignment = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="BlockRect" type="ColorRect" parent="." unique_id=2010297016]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="SettingsPanel" type="ColorRect" parent="." unique_id=586845491]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -894.0
+offset_top = -503.5
+offset_right = 894.0
+offset_bottom = 503.5
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.186459, 0.18645903, 0.18645895, 0.91764706)
+
+[node name="CloseBotton" type="Button" parent="SettingsPanel" unique_id=970863307]
+layout_mode = 1
+offset_right = 306.0
+offset_bottom = 121.5
+theme_override_fonts/font = ExtResource("2_ijodb")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_ijodb")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nh5sm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_u18oy")
+text = "<< BACK"
+
+[node name="SpeedSlider" type="HSlider" parent="SettingsPanel" unique_id=1874541235]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30425057
+anchor_top = 0.2676266
+anchor_right = 0.60906047
+anchor_bottom = 0.32373387
+offset_left = 5.0
+offset_top = 0.5
+offset_right = 5.0
+offset_bottom = 0.5
+min_value = 0.1
+max_value = 3.0
+step = 0.05
+value = 0.5
+metadata/_edit_use_anchors_ = true
+
+[node name="OffsetSlider" type="HSlider" parent="SettingsPanel" unique_id=155597112]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30704698
+anchor_top = 0.387289
+anchor_right = 0.6118568
+anchor_bottom = 0.44339624
+min_value = -1.0
+max_value = 1.0
+step = 0.01
+value = 0.5
+metadata/_edit_use_anchors_ = true
+
+[node name="BrightnessSlider" type="HSlider" parent="SettingsPanel" unique_id=993905201]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30704698
+anchor_top = 0.5064548
+anchor_right = 0.6118569
+anchor_bottom = 0.56256205
+max_value = 1.0
+step = 0.1
+metadata/_edit_use_anchors_ = true
+
+[node name="SpeedLabel" type="Label" parent="SettingsPanel" unique_id=1994266404]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.26812315
+anchor_right = 0.7544743
+anchor_bottom = 0.32423037
+offset_right = -6.1035156e-05
+label_settings = ExtResource("3_nh5sm")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="OffsetLabel" type="Label" parent="SettingsPanel" unique_id=1988780127]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.387289
+anchor_right = 0.7544743
+anchor_bottom = 0.44339624
+offset_right = -6.1035156e-05
+label_settings = ExtResource("3_nh5sm")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="BrightnessLabel" type="Label" parent="SettingsPanel" unique_id=1756972577]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.5064548
+anchor_right = 0.7544743
+anchor_bottom = 0.56256205
+offset_right = -6.1035156e-05
+label_settings = ExtResource("3_nh5sm")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label1" type="Label" parent="SettingsPanel" unique_id=1783789267]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.26861966
+anchor_right = 0.24804251
+anchor_bottom = 0.3247269
+offset_top = -0.5
+offset_right = 32.5
+offset_bottom = -0.5
+text = "Speed"
+label_settings = SubResource("LabelSettings_nh5sm")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Label2" type="Label" parent="SettingsPanel" unique_id=1220345907]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.387289
+anchor_right = 0.24804251
+anchor_bottom = 0.44339624
+offset_right = 33.0
+text = "Offset"
+label_settings = SubResource("LabelSettings_u18oy")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Label3" type="Label" parent="SettingsPanel" unique_id=1927439723]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.5064548
+anchor_right = 0.24804251
+anchor_bottom = 0.56256205
+text = "BG Brightness"
+label_settings = SubResource("LabelSettings_hms2r")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="EffectSlider" type="HSlider" parent="SettingsPanel" unique_id=2027558526]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30704698
+anchor_top = 0.62562066
+anchor_right = 0.6118569
+anchor_bottom = 0.6817279
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 0.1
+metadata/_edit_use_anchors_ = true
+
+[node name="EffectLabel" type="Label" parent="SettingsPanel" unique_id=1162543741]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.62562066
+anchor_right = 0.7544743
+anchor_bottom = 0.6817279
+label_settings = ExtResource("3_nh5sm")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label4" type="Label" parent="SettingsPanel" unique_id=1998233307]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.62562066
+anchor_right = 0.26621923
+anchor_bottom = 0.6817279
+offset_right = 3.0517578e-05
+text = "Effect"
+label_settings = SubResource("LabelSettings_hms2r")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="PreviewPlayer" type="AudioStreamPlayer" parent="." unique_id=495184997]
+
+[node name="SearchBox" type="LineEdit" parent="." unique_id=1489168088]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.22135417
+anchor_top = 0.019444445
+anchor_right = 0.4984375
+anchor_bottom = 0.11018518
+theme_override_fonts/font = ExtResource("2_ijodb")
+theme_override_font_sizes/font_size = 50
+placeholder_text = "  Search(only title)"
+metadata/_edit_use_anchors_ = true
+
+[node name="DeleteButton" type="Button" parent="." unique_id=1803276244]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.8197917
+anchor_top = 0.13611111
+anchor_right = 0.9760417
+anchor_bottom = 0.22685185
+theme_override_fonts/font = ExtResource("2_ijodb")
+theme_override_font_sizes/font_size = 50
+text = "Delete"
+metadata/_edit_use_anchors_ = true
+
+[node name="CustomConfirmDialog" type="ColorRect" parent="." unique_id=606538353]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.17923622, 0.17923622, 0.17923622, 0)
+
+[node name="DialogBox" type="Panel" parent="CustomConfirmDialog" unique_id=1274868907]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -200.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hms2r")
+
+[node name="MessageLabel" type="Label" parent="CustomConfirmDialog/DialogBox" unique_id=235636153]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -275.0
+offset_top = -45.0
+offset_right = 275.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = ExtResource("3_nh5sm")
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 6
+
+[node name="ConfirmBtn" type="Button" parent="CustomConfirmDialog/DialogBox" unique_id=484095143]
+layout_mode = 0
+offset_left = 145.0
+offset_top = 300.0
+offset_right = 305.0
+offset_bottom = 370.0
+theme_override_fonts/font = ExtResource("2_ijodb")
+theme_override_font_sizes/font_size = 40
+text = "Yes"
+
+[node name="CancelBtn" type="Button" parent="CustomConfirmDialog/DialogBox" unique_id=1629080182]
+layout_mode = 0
+offset_left = 395.0
+offset_top = 300.0
+offset_right = 555.0
+offset_bottom = 370.0
+theme_override_fonts/font = ExtResource("2_ijodb")
+theme_override_font_sizes/font_size = 40
+text = "No"
+
+[node name="ToastLabel" type="Label" parent="." unique_id=516596667]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = ExtResource("3_nh5sm")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]

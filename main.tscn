@@ -1,0 +1,433 @@
+[gd_scene format=3 uid="uid://3faac22k1tal"]
+
+[ext_resource type="Script" uid="uid://1cnpe78hlngw" path="res://main_ts.gd" id="1_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://cjbg0rl2pnsl1" path="res://Note.tscn" id="2_lquwl"]
+[ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="4_272bh"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://BgParticles.tscn" id="6_7mycd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquwl"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_3lv6b"]
+font = ExtResource("4_272bh")
+font_size = 50
+
+[sub_resource type="LabelSettings" id="LabelSettings_h2yge"]
+font = ExtResource("4_272bh")
+font_size = 60
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_7mycd"]
+font = ExtResource("4_272bh")
+font_size = 50
+
+[sub_resource type="LabelSettings" id="LabelSettings_1bvp3"]
+font = ExtResource("5_lquwl")
+font_size = 50
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_272bh"]
+bg_color = Color(1, 1, 1, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5vw27"]
+bg_color = Color(0.17923622, 0.87455684, 0.84613574, 0.814)
+
+[sub_resource type="Gradient" id="Gradient_lquwl"]
+colors = PackedColorArray(1, 1, 0.48000664, 1, 1, 1, 0, 0)
+
+[node name="Main" type="Node2D" unique_id=1752814112]
+script = ExtResource("1_1bvp3")
+note_scene = ExtResource("2_lquwl")
+
+[node name="Background" type="TextureRect" parent="." unique_id=537278165]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="DownRect" type="ColorRect" parent="." unique_id=581165523]
+offset_top = 940.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+color = Color(0.06100855, 0.06100855, 0.06100855, 0.748)
+metadata/_edit_use_anchors_ = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1656747401]
+
+[node name="BottomTrack" type="Node2D" parent="." unique_id=54329006]
+position = Vector2(960, 940)
+
+[node name="JudgmentGlow" type="ColorRect" parent="BottomTrack" unique_id=1897068024]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -12.5
+offset_right = 960.0
+offset_bottom = 12.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.8198382, 1, 0.9960334, 0.367)
+
+[node name="JudgmentLine" type="ColorRect" parent="BottomTrack" unique_id=685723854]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -3.0
+offset_right = 960.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="LeftTrack" type="Node2D" parent="." unique_id=1054547495]
+position = Vector2(110, 470)
+rotation = 1.5707964
+
+[node name="JudgmentLine" type="ColorRect" parent="LeftTrack" unique_id=1443484404]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -470.0
+offset_top = -3.0
+offset_right = 470.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="RightTrack" type="Node2D" parent="." unique_id=1450220634]
+position = Vector2(1810, 470)
+rotation = -1.5707964
+
+[node name="JudgmentLine" type="ColorRect" parent="RightTrack" unique_id=1761498748]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -470.0
+offset_top = -3.0
+offset_right = 470.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=400549872]
+
+[node name="PauseMenu" type="ColorRect" parent="HUD" unique_id=2132645169]
+process_mode = 3
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.53300005)
+
+[node name="RestartButton" type="Button" parent="HUD/PauseMenu" unique_id=2032517655]
+process_mode = 3
+layout_mode = 0
+anchor_left = 0.328125
+anchor_top = 0.5185185
+anchor_right = 0.43229166
+anchor_bottom = 0.6018519
+offset_bottom = -6.1035156e-05
+focus_mode = 0
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_lquwl")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_lquwl")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_lquwl")
+text = "Restart"
+metadata/_edit_use_anchors_ = true
+
+[node name="QuitButton" type="Button" parent="HUD/PauseMenu" unique_id=309022852]
+process_mode = 3
+layout_mode = 0
+anchor_left = 0.5677083
+anchor_top = 0.5185185
+anchor_right = 0.671875
+anchor_bottom = 0.6018519
+offset_bottom = -6.1035156e-05
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_7mycd")
+text = "Quit"
+metadata/_edit_use_anchors_ = true
+
+[node name="ComboLabel" type="Label" parent="HUD" unique_id=254665097]
+offset_left = 1249.0
+offset_top = 55.0
+offset_right = 1604.0
+offset_bottom = 126.0
+text = "COMBO"
+label_settings = SubResource("LabelSettings_3lv6b")
+vertical_alignment = 1
+
+[node name="JudgmentLabel" type="Label" parent="HUD" unique_id=1239211302]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = -1
+anchor_left = 0.65625
+anchor_top = 0.5842593
+anchor_right = 0.8255208
+anchor_bottom = 0.6611111
+offset_right = -57.0
+text = "PERFECT"
+label_settings = SubResource("LabelSettings_h2yge")
+metadata/_edit_use_anchors_ = true
+
+[node name="StatsLabel" type="Label" parent="HUD" unique_id=386728644]
+anchors_preset = -1
+anchor_left = 0.16458334
+anchor_top = 0.050925925
+anchor_right = 0.34947917
+anchor_bottom = 0.11666667
+text = "0/0/0"
+label_settings = SubResource("LabelSettings_7mycd")
+horizontal_alignment = 2
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="SongLabel" type="Label" parent="HUD" unique_id=739448958]
+anchors_preset = -1
+anchor_left = 0.019270834
+anchor_top = 0.87777776
+anchor_right = 0.50989586
+anchor_bottom = 0.975
+label_settings = SubResource("LabelSettings_1bvp3")
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="PauseButton" type="Button" parent="HUD" unique_id=1616526631]
+process_mode = 3
+anchors_preset = -1
+anchor_left = 0.453125
+anchor_top = 0.046296295
+anchor_right = 0.546875
+anchor_bottom = 0.1388889
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 75
+text = "||"
+flat = true
+metadata/_edit_use_anchors_ = true
+
+[node name="SongProgressBar" type="ProgressBar" parent="HUD" unique_id=1758229611]
+offset_right = 1920.0
+offset_bottom = 10.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_272bh")
+theme_override_styles/fill = SubResource("StyleBoxFlat_5vw27")
+show_percentage = false
+
+[node name="ResultMenu" type="ColorRect" parent="HUD" unique_id=347867198]
+process_mode = 3
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.4072413, 0.4072413, 0.4072413, 0.6)
+
+[node name="BgParticles" parent="HUD/ResultMenu" unique_id=349948908 instance=ExtResource("6_7mycd")]
+
+[node name="SongNameRect1" type="ColorRect" parent="HUD/ResultMenu" unique_id=1103975436]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 0.16203703
+offset_bottom = 1.5258789e-05
+color = Color(0.1897483, 0.1897483, 0.1897483, 0.89000005)
+metadata/_edit_use_anchors_ = true
+
+[node name="SongNameRect2" type="ColorRect" parent="HUD/ResultMenu" unique_id=1545388142]
+layout_mode = 0
+anchor_top = 0.14351852
+anchor_right = 1.0
+anchor_bottom = 0.16203703
+offset_bottom = 1.5258789e-05
+color = Color(0.48000664, 1, 1, 0.70000005)
+metadata/_edit_use_anchors_ = true
+
+[node name="ScoreLabel" type="RichTextLabel" parent="HUD/ResultMenu" unique_id=751185899]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.058333334
+anchor_top = 0.18425927
+anchor_right = 0.665625
+anchor_bottom = 0.38518518
+theme_override_fonts/normal_font = ExtResource("4_272bh")
+theme_override_font_sizes/normal_font_size = 80
+bbcode_enabled = true
+metadata/_edit_use_anchors_ = true
+
+[node name="DetailsLabel" type="Label" parent="HUD/ResultMenu" unique_id=2092147902]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05625
+anchor_top = 0.4185185
+anchor_right = 0.6796875
+anchor_bottom = 0.9074074
+theme_override_fonts/font = ExtResource("4_272bh")
+theme_override_font_sizes/font_size = 65
+metadata/_edit_use_anchors_ = true
+
+[node name="SongNameLabel" type="Label" parent="HUD/ResultMenu" unique_id=939496081]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05625
+anchor_top = 0.024074074
+anchor_right = 0.94375
+anchor_bottom = 0.14351852
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 90
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="RestartButton" type="Button" parent="HUD/ResultMenu" unique_id=1092357169]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.82239586
+anchor_top = 0.7574074
+anchor_right = 0.971875
+anchor_bottom = 0.8407408
+offset_left = -2.0
+offset_right = 11.0
+offset_bottom = -6.1035156e-05
+focus_mode = 0
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_lquwl")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_lquwl")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_lquwl")
+text = "Restart"
+metadata/_edit_use_anchors_ = true
+
+[node name="QuitButton" type="Button" parent="HUD/ResultMenu" unique_id=1424826521]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.82916665
+anchor_top = 0.8787037
+anchor_right = 0.978125
+anchor_bottom = 0.962037
+offset_left = -15.0
+offset_right = -1.0
+offset_bottom = -6.1035156e-05
+theme_override_fonts/font = ExtResource("5_lquwl")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_7mycd")
+text = "Quit"
+metadata/_edit_use_anchors_ = true
+
+[node name="AP_Overlay" type="Control" parent="HUD" unique_id=1028625106]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DimBackground" type="ColorRect" parent="HUD/AP_Overlay" unique_id=1016619741]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="AP_Center" type="Control" parent="HUD/AP_Overlay" unique_id=1818889802]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopLine" type="ColorRect" parent="HUD/AP_Overlay/AP_Center" unique_id=1569197895]
+layout_mode = 0
+offset_left = -450.0
+offset_top = -80.0
+offset_right = 450.0
+offset_bottom = -76.0
+pivot_offset = Vector2(450, 2)
+
+[node name="BottomLine" type="ColorRect" parent="HUD/AP_Overlay/AP_Center" unique_id=1356423338]
+layout_mode = 0
+offset_left = -450.0
+offset_top = 100.0
+offset_right = 450.0
+offset_bottom = 104.0
+pivot_offset = Vector2(450, 2)
+
+[node name="AP_Label" type="Label" parent="HUD/AP_Overlay/AP_Center" unique_id=708131651]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -324.0
+offset_top = -40.5
+offset_right = 324.0
+offset_bottom = 40.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(324, 40.5)
+theme_override_fonts/font = ExtResource("4_272bh")
+theme_override_font_sizes/font_size = 80
+text = "ALL PERFECT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AP_Particles" type="CPUParticles2D" parent="HUD/AP_Overlay/AP_Center" unique_id=856730844]
+emitting = false
+amount = 100
+lifetime = 1.48
+one_shot = true
+explosiveness = 0.95
+spread = 180.0
+gravity = Vector2(2, 0)
+initial_velocity_min = 585.72
+initial_velocity_max = 830.16
+scale_amount_min = 12.0
+scale_amount_max = 16.0
+color_ramp = SubResource("Gradient_lquwl")

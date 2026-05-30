@@ -1,0 +1,2 @@
+# DynamiCore
+Dynamite Fanmade
