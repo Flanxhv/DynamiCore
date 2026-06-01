@@ -12,10 +12,14 @@ var speed: float = 1500
 var has_touch_screen: bool = false
 var is_ap_animating: bool = false
 var total_expected_judgments: int = 0
-
+var blur_effect_material: ShaderMaterial = null
 var warning_events: Array[Dictionary] = []
 var current_warning_idx: int = 0
 
+@onready var offset_label = $HUD/PauseMenu/OffsetLabel
+@onready var offset_minus_btn = $HUD/PauseMenu/OffsetMinusButton
+@onready var offset_plus_btn = $HUD/PauseMenu/OffsetPlusButton
+@onready var result_diff_line = $HUD/ResultMenu/SongNameRect2
 @onready var ap_particles = $HUD/AP_Overlay/AP_Center/AP_Particles
 @onready var song_label = $HUD/SongLabel
 @onready var progress_bar = $HUD/SongProgressBar
@@ -88,6 +92,14 @@ func _ready():
 		get_tree().change_scene_to_file("uid://dnda82ibqdnuq")
 		return
 	
+	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
+	Global.current_song_data["song_offset"] = Global.get_song_offset(song_id)
+
+	# ★ 新增：綁定暫停選單中的校準按鈕事件，並更新文字
+	if offset_minus_btn and offset_plus_btn:
+		offset_minus_btn.pressed.connect(_on_offset_minus_pressed)
+		offset_plus_btn.pressed.connect(_on_offset_plus_pressed)
+		_update_offset_label()
 	# ★ 處理背景圖與亮度
 	# 留下接口：只要改變 bg_brightness (0.0 暗 ~ 1.0 亮)，就能控制背景明暗
 	background.modulate = Color(Global.bg_brightness, Global.bg_brightness, Global.bg_brightness, 1.0)
@@ -178,6 +190,7 @@ func _ready():
 	res_restart_btn.pressed.connect(_on_restart_button_pressed)
 	res_quit_btn.pressed.connect(_on_quit_button_pressed)
 	audio_player.finished.connect(_on_audio_finished)
+	_init_blur_material()
 
 func _on_audio_finished():
 	if is_ap_animating:
@@ -291,10 +304,13 @@ func parse_dynamix_xml(file_path: String):
 	var sec_per_bar = 60.0 / bar_per_min if bar_per_min > 0 else 0
 	var id_dict = {}
 	
+	var current_song_offset = Global.current_song_data.get("song_offset", 0.0)
+	
 	# 步驟 1：計算所有音符的真實時間，並存入字典方便搜尋
 	for n in temp_all_notes:
 		# 【修正錯位】將 + time_offset 改為 - time_offset
-		n.real_time = (n.time * sec_per_bar) - time_offset + Global.device_offset
+		# ★ 新增：將 current_song_offset 加上去
+		n.real_time = (n.time * sec_per_bar) - time_offset + Global.device_offset + current_song_offset
 		
 		# ★ 修正：將 ID 加上軌道標籤 (side)，避免左中右三條軌道的 ID 互相覆蓋！
 		var unique_id = str(n.side) + "_" + str(n.id)
@@ -862,40 +878,100 @@ func _show_feedback(judge_text: String):
 			is_ap_animating = true 
 			_play_ap_animation()
 
+func _init_blur_material():
+	var shader = Shader.new()
+	shader.code = """
+	shader_type canvas_item;
+	
+	void fragment() {
+		// 取得 ColorRect 傳進來的顏色 (包含 hit_color)
+		vec4 base_color = COLOR;
+		
+		// ==========================================
+		// 1. X 軸的平滑邊緣 (模擬高斯模糊)
+		// ==========================================
+		// UV.x 範圍 0.0 ~ 1.0，0.5 是中心點。
+		// dist_x 算出來後，中心點是 0.0，最外緣是 1.0
+		float dist_x = abs(UV.x - 0.5) * 2.0; 
+		
+		// smoothstep(0.5, 1.0) 代表：內部 50% 是純色，外部的 50% 進行平滑羽化淡出
+		float alpha_x = 1.0 - smoothstep(0.8, 1.0, dist_x);
+		
+		// ==========================================
+		// 2. Y 軸的弱漸淡
+		// ==========================================
+		// UV.y 範圍 0.0(頂部) ~ 1.0(底部)
+		// smoothstep(0.0, 0.7) 代表：底部 30% 保持實心，往上慢慢變淡
+		float alpha_y = smoothstep(0.0, 0.7, UV.y);
+		
+		// 漸淡微弱一點：讓最頂端不要完全消失，保留 15% 的透明度底線
+		alpha_y = max(alpha_y, 0.10); 
+		
+		// 合併透明度計算
+		base_color.a *= (alpha_x * alpha_y);
+		COLOR = base_color;
+	}
+	"""
+	
+	blur_effect_material = ShaderMaterial.new()
+	blur_effect_material.shader = shader
+	
 func spawn_hit_effect(note: Node2D, hit_color: Color):
-	var effect = TextureRect.new()
-	effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 假設 0 = 原版 (TextureRect), 1 = 新版收縮版 (Line2D)
+	var effect_style = Global.get("hit_effect_style")
+	if effect_style == null: effect_style = 1 # 防呆預設
 	
-	# 1. 建立動態漸層材質
-	var grad_tex = GradientTexture2D.new()
-	grad_tex.fill_from = Vector2(0, 1) # 漸層起點：底部 (1.0)
-	grad_tex.fill_to = Vector2(0, 0)   # 漸層終點：頂部 (0.0)
+	var effect_height = 350.0 * Global.effect_height_ratio
 	
-	var grad = Gradient.new()
-	# 設定底部顏色為實心打擊色，頂部顏色為完全透明的打擊色
-	grad.set_color(0, hit_color) 
-	grad.set_color(1, Color(hit_color.r, hit_color.g, hit_color.b, 0.0)) 
-	
-	grad_tex.gradient = grad
-	effect.texture = grad_tex
-	
-	# 2. 設定光柱的大小 (固定寬度，高度拉長到 150 像素)
-	var effect_height = 350.0*Global.effect_height_ratio
-	effect.size = Vector2(note.hit_width, effect_height)
-	
-	# 3. 定位：讓光柱的底部剛好穩穩踩在判定線上 (-effect_height 加上微調)
-	effect.position = Vector2(note.position.x - (note.hit_width / 2.0), -effect_height + 10.0)
-	
-	note.get_parent().add_child(effect)
-	
-	# 4. 動畫：光柱會稍微往上衝刺，同時淡出消失
-	var t = create_tween().set_parallel(true)
-	# Y 軸稍微往上飄 30 像素，增加打擊的動態力道感
-	t.tween_property(effect, "position:y", effect.position.y - 30.0, 0.2)
-	# 透明度花 0.2 秒徹底歸零
-	t.tween_property(effect, "modulate:a", 0.0, 0.2)
-	
-	t.chain().tween_callback(effect.queue_free)
+	if !effect_style:
+		# ==========================================
+		# [模式 0] 舊版 TextureRect 實作
+		# ==========================================
+		var effect = TextureRect.new()
+		effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
+		var grad_tex = GradientTexture2D.new()
+		grad_tex.fill_from = Vector2(0, 1)
+		grad_tex.fill_to = Vector2(0, 0)
+		
+		var grad = Gradient.new()
+		grad.set_color(0, hit_color) 
+		grad.set_color(1, Color(hit_color.r, hit_color.g, hit_color.b, 0.0)) 
+		grad_tex.gradient = grad
+		effect.texture = grad_tex
+		
+		effect.size = Vector2(note.hit_width, effect_height)
+		effect.position = Vector2(note.position.x - (note.hit_width / 2.0), -effect_height + 10.0)
+		
+		note.get_parent().add_child(effect)
+		
+		var t = create_tween().set_parallel(true)
+		t.tween_property(effect, "position:y", effect.position.y - 30.0, 0.2)
+		t.tween_property(effect, "modulate:a", 0.0, 0.2)
+		t.chain().tween_callback(effect.queue_free)
+		
+	else:
+		var effect = ColorRect.new()
+		effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
+		# 1. 略寬一點 (比音符判定範圍多出 30 像素，讓邊緣羽化有空間發揮)
+		var wider_width = note.hit_width + 50.0
+		effect.size = Vector2(wider_width, effect_height)
+		
+		# 2. 定位 (X 軸需要扣掉加寬的一半來維持中心對齊)
+		effect.position = Vector2(note.position.x - (wider_width / 2.0), -effect_height + 10.0)
+		
+		# 3. 套用 Shader 與顏色
+		effect.material = blur_effect_material
+		effect.color = hit_color # 直接給予顏色，Shader 的 COLOR 會自動接收
+		
+		note.get_parent().add_child(effect)
+		
+		# 4. 動畫 (與你原本的邏輯相同，往上飄並整體淡出)
+		var t = create_tween().set_parallel(true)
+		t.tween_property(effect, "position:y", effect.position.y - 30.0, 0.2)
+		t.tween_property(effect, "modulate:a", 0.0, 0.2)
+		t.chain().tween_callback(effect.queue_free)
 	
 func reset_combo_from_miss():
 	current_combo = 0
@@ -991,7 +1067,9 @@ func _show_result_screen():
 	
 	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
 	var diff_type = Global.current_chart_path.get_file().get_basename()
-	
+	if result_diff_line != null:
+		var diff_color = _get_diff_color(diff_type)
+		result_diff_line.color = diff_color
 	# ==========================================
 	# ★ AUTO 模式結算攔截：顯示 AUTO 且不儲存分數
 	# ==========================================
@@ -1103,3 +1181,50 @@ func load_external_image(path: String) -> Texture2D:
 			
 	print("找不到圖片檔案或讀取失敗：", path)
 	return null
+
+func _get_diff_color(diff_raw: String) -> Color:
+	var upper_diff = diff_raw.to_upper() # 防呆：強制轉大寫比對
+	if "NORMAL" in upper_diff: return Color(0, 0.55, 0.65)
+	elif "HARD" in upper_diff: return Color(0.95, 0.2, 0.25) 
+	elif "MEGA" in upper_diff: return Color(0.6, 0.2, 0.8)
+	elif "GIGA" in upper_diff: return Color(0.4, 0.4, 0.4)
+	elif "CASUAL" in upper_diff: return Color(0, 0.8, 0.5)
+	elif "TERA" in upper_diff: return Color(0, 0, 0)
+	
+	# 如果都沒配對到，給一個預設的灰色
+	return Color(0.5, 0.5, 0.5)
+
+# ==========================================
+# ★ 單曲專屬校準系統
+# ==========================================
+func _on_offset_minus_pressed():
+	var current_offset = Global.current_song_data.get("song_offset", 0.0)
+	var new_offset = current_offset - 0.01 # 每次減少 10 毫秒
+	
+	# 更新當前記憶體
+	Global.current_song_data["song_offset"] = new_offset
+	
+	# 觸發 Global 實體存檔
+	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
+	Global.save_song_offset(song_id, new_offset)
+	
+	_update_offset_label()
+
+func _on_offset_plus_pressed():
+	var current_offset = Global.current_song_data.get("song_offset", 0.0)
+	var new_offset = current_offset + 0.01 # 每次增加 10 毫秒
+	
+	# 更新當前記憶體
+	Global.current_song_data["song_offset"] = new_offset
+	
+	# 觸發 Global 實體存檔
+	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
+	Global.save_song_offset(song_id, new_offset)
+	
+	_update_offset_label()
+
+func _update_offset_label():
+	if offset_label:
+		var current_offset = Global.current_song_data.get("song_offset", 0.0)
+		# 顯示到小數點後 3 位 (毫秒)
+		offset_label.text = "Offset\n%+.2fs" % current_offset

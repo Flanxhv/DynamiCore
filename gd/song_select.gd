@@ -14,6 +14,7 @@ extends Control
 @onready var cancel_btn = $CustomConfirmDialog/DialogBox/CancelBtn
 @onready var speed_slider = $SettingsPanel/SpeedSlider
 @onready var speed_label = $SettingsPanel/SpeedLabel
+@onready var effect_style_toggle = $SettingsPanel/EffectStyleToggle
 @onready var offset_slider = $SettingsPanel/OffsetSlider
 @onready var offset_label = $SettingsPanel/OffsetLabel
 @onready var brightness_slider = $SettingsPanel/BrightnessSlider
@@ -99,7 +100,10 @@ func _ready():
 	offset_slider.value = Global.device_offset
 	brightness_slider.value = Global.bg_brightness
 	effect_slider.value = Global.effect_height_ratio
-	
+	if effect_style_toggle:
+		effect_style_toggle.button_pressed = Global.hit_effect_style
+		# 連接 Toggled 信號
+		effect_style_toggle.toggled.connect(_on_effect_style_toggled)
 	_update_setting_labels()
 	
 	speed_slider.value_changed.connect(_on_speed_changed)
@@ -410,7 +414,12 @@ func _on_effect_changed(value: float):
 	Global.effect_height_ratio = value
 	_update_setting_labels()
 	Global.save_settings()
-	
+func _on_effect_style_toggled(toggled_on: bool):
+	Global.hit_effect_style = toggled_on
+	Global.save_settings()
+	if Global.has_method("play_click"):
+		UiSoundManager.play_click()
+		
 func _on_song_button_pressed(song_data: Dictionary, clicked_btn: Button):
 	if current_selected_song == song_data:
 		return

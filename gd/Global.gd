@@ -4,9 +4,10 @@ var current_song_data: Dictionary = {}
 var current_chart_path: String = "" # 記錄最終選擇的具體難度譜面路徑
 
 var note_speed_mult: float = 1.0  # 下落速度倍率 (預設 1.0x)
-var device_offset: float = 0.0    # 裝置聲音延遲校準 (單位：秒)
+var device_offset: float = 0.00    # 裝置聲音延遲校準 (單位：秒)
 var bg_brightness: float = 0.4    # 背景暗化亮度 (0.0 全黑 ~ 1.0 原圖)
 var effect_height_ratio = 1.0 
+var hit_effect_style: bool = false
 var song_list: Array = [
 	{
 		"id": "base_song_01", # 確保有給一個唯一的 ID 用來存分數
@@ -31,9 +32,17 @@ var last_selected_song_id: String = ""
 var last_selected_diff_index: int = 0
 var settings_path = "user://settings.json"
 
+# ==========================================
+# ★ 新增：單曲專屬校準值的存檔路徑與變數
+# ==========================================
+var offset_save_path = "user://song_offsets.json"
+var saved_offsets: Dictionary = {} 
+# ==========================================
+
 func _ready():
 	load_scores()
 	load_settings()
+	load_offsets() # ★ 新增：遊戲啟動時載入所有單曲校準值
 
 func load_scores():
 	if FileAccess.file_exists(save_path):
@@ -61,7 +70,8 @@ func save_settings():
 		"device_offset": device_offset,
 		"note_speed_mult": note_speed_mult,
 		"bg_brightness": bg_brightness,
-		"effect_height_ratio": effect_height_ratio
+		"effect_height_ratio": effect_height_ratio,
+		"hit_effect_style": hit_effect_style
 	}
 	
 	var file = FileAccess.open(settings_path, FileAccess.WRITE)
@@ -70,15 +80,37 @@ func save_settings():
 		file.close()
 
 func load_settings():
-	# 檢查有沒有舊的設定檔
 	if FileAccess.file_exists(settings_path):
 		var file = FileAccess.open(settings_path, FileAccess.READ)
 		var data = JSON.parse_string(file.get_as_text())
 		file.close()
 		
-		# 如果成功解析出字典，就覆蓋掉目前的預設值
 		if data != null and typeof(data) == TYPE_DICTIONARY:
 			device_offset = data.get("device_offset", 0.0)
 			note_speed_mult = data.get("note_speed_mult", 1.0)
 			bg_brightness = data.get("bg_brightness", 0.4)
 			effect_height_ratio = data.get("effect_height_ratio", 1.0)
+			hit_effect_style = data.get("hit_effect_style", false)
+
+# ==========================================
+# ★ 新增：單曲專屬校準值的讀寫系統
+# ==========================================
+func load_offsets():
+	if FileAccess.file_exists(offset_save_path):
+		var file = FileAccess.open(offset_save_path, FileAccess.READ)
+		var data = JSON.parse_string(file.get_as_text())
+		file.close()
+		
+		if data != null and typeof(data) == TYPE_DICTIONARY:
+			saved_offsets = data
+
+func save_song_offset(song_id: String, offset: float):
+	saved_offsets[song_id] = offset
+	
+	var file = FileAccess.open(offset_save_path, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(saved_offsets))
+		file.close()
+
+func get_song_offset(song_id: String) -> float:
+	return saved_offsets.get(song_id, 0.0)
