@@ -46,7 +46,7 @@ func setup_visual(pixel_width: float, is_side_track: bool, note_type: String):
 	# ==========================================
 	if type == "CHAIN":
 		# 1. 提昇渲染層級
-		z_index = 1
+		z_index = 2
 		
 		# 2. 將原本的方形 ColorRect 設為「完全透明」，讓它退居幕後當隱形容器
 		visual.color = Color(0.46, 0.847, 1.0, 0.0) 
@@ -138,7 +138,7 @@ func _process(delta):
 			is_missed = true 
 			if main_scene.has_method("reset_combo_from_miss"):
 				main_scene.reset_combo_from_miss()
-			print("LATE MISS! ", type, " 漏掉了 (-159ms)")
+
 
 	var head_y = 0.0
 	

@@ -792,8 +792,12 @@ func check_hold_notes():
 		var t_diff_tail = note.tail_time - current_time
 		
 		# 狀況 A：玩家手指離開了！
+		# 狀況 A：玩家手指離開了！
 		if not is_finger_still_on_it:
-			if t_diff_tail > 0.0 and t_diff_tail <= 0.060:
+			# ★ 核心修正：移除 > 0.0 的限制
+			# 只要距離尾巴小於 60ms（包含尾巴已經過線的負數時間）
+			# 且因為程式走到這代表 grace_timer 還沒破 0.15s，就該直接給予成功！
+			if t_diff_tail <= 0.060:
 				spawn_hit_effect(note, Color(1.0, 1.0, 1.0, 0.8))
 				note.hit_tail()
 				current_combo += 1
@@ -802,7 +806,7 @@ func check_hold_notes():
 				var grace_time = note.get_meta("grace_timer") if note.has_meta("grace_timer") else 0.0
 				grace_time += get_process_delta_time() # 累加玩家鬆開螢幕的時間
 				
-				if grace_time > 0.100: 
+				if grace_time > 0.150: 
 					note.break_hold()
 				else:
 					note.set_meta("grace_timer", grace_time)
@@ -903,8 +907,7 @@ func _init_blur_material():
 		// UV.y 範圍 0.0(頂部) ~ 1.0(底部)
 		// smoothstep(0.0, 0.7) 代表：底部 30% 保持實心，往上慢慢變淡
 		float alpha_y = smoothstep(0.0, 0.7, UV.y);
-		
-		// 漸淡微弱一點：讓最頂端不要完全消失，保留 15% 的透明度底線
+		float fade_out_bottom = 1.0 - smoothstep(0.98, 1.0, UV.y);
 		alpha_y = max(alpha_y, 0.10); 
 		
 		// 合併透明度計算
@@ -959,7 +962,7 @@ func spawn_hit_effect(note: Node2D, hit_color: Color):
 		effect.size = Vector2(wider_width, effect_height)
 		
 		# 2. 定位 (X 軸需要扣掉加寬的一半來維持中心對齊)
-		effect.position = Vector2(note.position.x - (wider_width / 2.0), -effect_height + 10.0)
+		effect.position = Vector2(note.position.x - (wider_width / 2.0), -effect_height + 25.0)
 		
 		# 3. 套用 Shader 與顏色
 		effect.material = blur_effect_material
@@ -1114,19 +1117,31 @@ func _show_result_screen():
 		else:
 			rank = "F"
 			rank_color = "#000000"
-			
-		if judge_stats["MISS"] == 0 and total_notes_judged > 0:
-			if judge_stats["GOOD"] == 0:
-				rank += " (ALL PERFECT!)"
-			else:
-				rank += " (FULL COMBO!)"
-				
+		
 		result_details_label.text = "MAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
 			max_combo,
 			judge_stats["PERFECT"],
 			judge_stats["GOOD"],
 			judge_stats["MISS"]
 		]
+		
+		if judge_stats["MISS"] == 0 and total_notes_judged > 0:
+			if judge_stats["GOOD"] == 0:
+				result_details_label.text = "ALL PERFECT\n\nMAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
+					max_combo,
+					judge_stats["PERFECT"],
+					judge_stats["GOOD"],
+					judge_stats["MISS"]
+				]
+			else:
+				result_details_label.text = "FULL COMBO\n\nMAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
+					max_combo,
+					judge_stats["PERFECT"],
+					judge_stats["GOOD"],
+					judge_stats["MISS"]
+				]
+				
+		
 	# ==========================================
 
 	result_song_label.text = Global.current_song_data["title"]

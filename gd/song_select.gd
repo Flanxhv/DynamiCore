@@ -26,7 +26,10 @@ extends Control
 @onready var search_box = $SearchBox
 
 @onready var preview_player = $PreviewPlayer 
+@onready var scroll_container = $ScrollContainer
+@onready var scroll_bg = $ScrollBg
 
+var scroll_fade_tween: Tween
 var local_songs: Array = []
 var current_selected_song: Dictionary = {}
 var current_diff_index: int = 0 
@@ -483,6 +486,7 @@ func _on_song_button_pressed(song_data: Dictionary, clicked_btn: Button):
 		tween.tween_property(bg_cover, "modulate:a", 1.0, 0.3)
 		
 	_update_difficulty_ui(song_data)
+	_wake_up_scroll_container()
 
 func _update_difficulty_ui(song_data: Dictionary):
 	# ... (維持原樣) ...
@@ -783,6 +787,10 @@ func _on_confirm_btn_pressed():
 		
 		# 復原未選取狀態
 		current_selected_song = {}
+		
+		if scroll_fade_tween: scroll_fade_tween.kill()
+		scroll_container.modulate.a = 1.0
+		
 		diamond_menu.visible = false 
 		
 		if preview_player.playing:
@@ -859,3 +867,43 @@ func show_toast(msg: String):
 	tween.tween_interval(1.5) # 停留 1.5 秒
 	tween.tween_property(toast_label, "modulate:a", 0.0, 0.5) # 花 0.5 秒透明度變 0
 	tween.tween_callback(func(): toast_label.visible = false) # 完全透明後關閉顯示
+
+
+func _wake_up_scroll_container():
+	# 如果還沒選擇任何歌曲，保持常駐顯示，不觸發自動隱藏
+	if current_selected_song.is_empty():
+		return
+		
+	# 殺掉舊的倒數動畫 (避免玩家連續觸碰時，動畫互相衝突)
+	if scroll_fade_tween:
+		scroll_fade_tween.kill()
+		
+	# 瞬間恢復 100% 不透明
+	scroll_container.modulate.a = 1.0
+	scroll_bg.modulate.a = 1.0
+	# 建立新的計時動畫：先等待 3 秒 -> 接著花 0.5 秒將透明度降至 0 (完全隱藏)
+	scroll_fade_tween = create_tween()
+	scroll_fade_tween.tween_interval(2.0)
+	
+	scroll_fade_tween.tween_property(scroll_container, "modulate:a", 0.0, 0.5)
+	scroll_fade_tween.parallel().tween_property(scroll_bg, "modulate:a", 0.0, 0.5)
+
+func _input(event):
+	# 如果還沒選歌，不需要偵測喚醒
+	if current_selected_song.is_empty():
+		return
+		
+	# 判斷是否為滑鼠移動、點擊，或是手機的觸控、滑動事件
+	if event is InputEventMouse or event is InputEventScreenTouch or event is InputEventScreenDrag:
+		
+		# 檢查觸碰的座標點，是否落在 ScrollContainer 的 UI 範圍內
+		if scroll_container.get_global_rect().has_point(event.position):
+			
+			# 【防呆機制】如果清單已經非常透明(隱藏)，此時玩家的「點擊」只是為了喚醒 UI
+			# 我們必須攔截這次點擊，避免玩家「盲點」到看不見的歌曲按鈕
+			if scroll_container.modulate.a < 0.1 and (event is InputEventMouseButton or event is InputEventScreenTouch) and event.is_pressed():
+				_wake_up_scroll_container()
+				get_viewport().set_input_as_handled() # 吞掉這次點擊，不往下傳遞給歌曲按鈕
+			else:
+				# 如果清單還看得見，或者是單純的滑動/游標移動，就單純重置 3 秒計時器
+				_wake_up_scroll_container()

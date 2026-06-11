@@ -3,6 +3,27 @@
 [ext_resource type="Script" uid="uid://3mlbe03uukac" path="res://gd/main_menu.gd" id="1_i26rj"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_eiy7p"]
 [ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_h7a2f"]
+[ext_resource type="Shader" uid="uid://cuxbkp5gy2pca" path="res://tscn/FrostedGlass.gdshader" id="3_lf5xi"]
+[ext_resource type="StyleBox" uid="uid://mxeiauawvhii" path="res://tres/main_menu_style_box_flat.tres" id="4_4wa2v"]
+[ext_resource type="Texture2D" uid="uid://ba5upex7q4yyp" path="res://pic/test.png" id="4_yqkob"]
+[ext_resource type="Script" uid="uid://trcieyrpulyx" path="res://gd/main_menu_button.gd" id="5_nfaoi"]
+[ext_resource type="Script" uid="uid://c6dhdx7qr52kx" path="res://gd/character_button.gd" id="5_o2u1m"]
+[ext_resource type="LabelSettings" uid="uid://dph0fjunkk5ps" path="res://tres/label_settings.tres" id="6_c3tst"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkob"]
+shader = ExtResource("3_lf5xi")
+shader_parameter/blur_amount = 1.5
+shader_parameter/tint_color = Color(0.1, 0.1, 0.1, 0.2)
+shader_parameter/split_x = 0.65
+shader_parameter/slant = -0.1
+shader_parameter/line_thickness = 0.004
+shader_parameter/line_color = Color(0.4, 0.8, 1, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bopfr"]
+bg_color = Color(0.52305055, 0.52305055, 0.52305055, 1)
+shadow_color = Color(0.30153242, 0.90382373, 1, 0.614)
+shadow_size = 12
+shadow_offset = Vector2(12, 10)
 
 [node name="MainMenu" type="Control" unique_id=620197947]
 layout_mode = 3
@@ -23,6 +44,51 @@ grow_vertical = 2
 
 [node name="BgParticles" parent="." unique_id=349948908 instance=ExtResource("2_h7a2f")]
 
+[node name="FrostedGlassOverlay" type="ColorRect" parent="." unique_id=1489755603]
+material = SubResource("ShaderMaterial_yqkob")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CharacterButton" type="TextureButton" parent="." unique_id=559264471]
+layout_mode = 0
+offset_left = 1356.0
+offset_top = 316.0
+offset_right = 1837.0
+offset_bottom = 1078.0
+focus_mode = 0
+texture_normal = ExtResource("4_yqkob")
+script = ExtResource("5_o2u1m")
+
+[node name="Bubble" type="PanelContainer" parent="CharacterButton" unique_id=352574128]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.14137214
+anchor_top = 0.6167979
+anchor_right = 1.049896
+anchor_bottom = 0.8569554
+offset_top = -3.0517578e-05
+theme_override_styles/panel = SubResource("StyleBoxFlat_bopfr")
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="CharacterButton/Bubble" unique_id=409309056]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Label" type="Label" parent="CharacterButton/Bubble/MarginContainer" unique_id=832583834]
+custom_minimum_size = Vector2(540, 0)
+layout_mode = 2
+text = "?????"
+label_settings = ExtResource("6_c3tst")
+autowrap_mode = 3
+
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1843824201]
 layout_mode = 1
 anchors_preset = -1
@@ -41,24 +107,30 @@ custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_eiy7p")
 theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = ExtResource("4_4wa2v")
 text = "Play"
+script = ExtResource("5_nfaoi")
 
 [node name="ChartButton" type="Button" parent="VBoxContainer" unique_id=2084429656]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_eiy7p")
 theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = ExtResource("4_4wa2v")
 text = "Chart
 "
+script = ExtResource("5_nfaoi")
 
 [node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=747982940]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_eiy7p")
 theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = ExtResource("4_4wa2v")
 text = "Quit"
+script = ExtResource("5_nfaoi")
 
 [connection signal="pressed" from="VBoxContainer/ChooseSongButton" to="." method="_on_play_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/ChartButton" to="." method="_on_chart_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/ChartButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ChartButton" to="." method="_on_chart_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
