@@ -36,11 +36,14 @@ jobs:
           PROJECT_FILE=$(ls *.xcodeproj)
           SCHEME_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
           
-          # 呼叫 Xcode 進行無簽署編譯，並將編譯結果輸出到當前的 build 資料夾
+          # 呼叫 Xcode 進行無簽署編譯
+          # 新增了 CODE_SIGN_STYLE="Manual" 與 PROVISIONING_PROFILE_SPECIFIER="" 來覆蓋 Godot 的預設值
           xcodebuild -project "$PROJECT_FILE" \
                      -scheme "$SCHEME_NAME" \
                      -configuration Release \
+                     CODE_SIGN_STYLE="Manual" \
                      CODE_SIGN_IDENTITY="" \
+                     PROVISIONING_PROFILE_SPECIFIER="" \
                      CODE_SIGNING_REQUIRED=NO \
                      CODE_SIGNING_ALLOWED=NO \
                      SYMROOT="$(PWD)/xcode_build" \
