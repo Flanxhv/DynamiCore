@@ -32,12 +32,12 @@ jobs:
       - name: 🏗️ 強制無簽署編譯 (Xcodebuild)
         run: |
           cd build/ios
-          # 動態抓取專案名稱
-          PROJECT_FILE=$(ls *.xcodeproj)
-          SCHEME_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
+          
+          # 直接指定專案與 Scheme 的名稱（因為前面匯出時已經命名為 project.xcodeproj 了）
+          PROJECT_FILE="project.xcodeproj"
+          SCHEME_NAME="project"
           
           # 呼叫 Xcode 進行無簽署編譯
-          # 新增了 CODE_SIGN_STYLE="Manual" 與 PROVISIONING_PROFILE_SPECIFIER="" 來覆蓋 Godot 的預設值
           xcodebuild -project "$PROJECT_FILE" \
                      -scheme "$SCHEME_NAME" \
                      -configuration Release \
