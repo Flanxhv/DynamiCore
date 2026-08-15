@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_h7a2f"]
 [ext_resource type="Shader" uid="uid://cuxbkp5gy2pca" path="res://tscn/FrostedGlass.gdshader" id="3_lf5xi"]
 [ext_resource type="StyleBox" uid="uid://mxeiauawvhii" path="res://tres/main_menu_style_box_flat.tres" id="4_4wa2v"]
-[ext_resource type="Texture2D" uid="uid://ba5upex7q4yyp" path="res://pic/test.png" id="4_yqkob"]
+[ext_resource type="Texture2D" uid="uid://cn07vtl076cg2" path="res://pic/tokem.png" id="4_o2u1m"]
 [ext_resource type="Script" uid="uid://trcieyrpulyx" path="res://gd/main_menu_button.gd" id="5_nfaoi"]
 [ext_resource type="Script" uid="uid://c6dhdx7qr52kx" path="res://gd/character_button.gd" id="5_o2u1m"]
 [ext_resource type="LabelSettings" uid="uid://dph0fjunkk5ps" path="res://tres/label_settings.tres" id="6_c3tst"]
@@ -13,7 +13,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkob"]
 shader = ExtResource("3_lf5xi")
 shader_parameter/blur_amount = 1.5
-shader_parameter/tint_color = Color(0.1, 0.1, 0.1, 0.2)
+shader_parameter/tint_color = Color(0.09985284, 0.09985284, 0.09985284, 0.058000002)
 shader_parameter/split_x = 0.65
 shader_parameter/slant = -0.1
 shader_parameter/line_thickness = 0.004
@@ -55,12 +55,12 @@ grow_vertical = 2
 
 [node name="CharacterButton" type="TextureButton" parent="." unique_id=559264471]
 layout_mode = 0
-offset_left = 1356.0
-offset_top = 316.0
-offset_right = 1837.0
-offset_bottom = 1078.0
+offset_left = 1286.0
+offset_top = 319.0
+offset_right = 1886.0
+offset_bottom = 1081.0
 focus_mode = 0
-texture_normal = ExtResource("4_yqkob")
+texture_normal = ExtResource("4_o2u1m")
 script = ExtResource("5_o2u1m")
 
 [node name="Bubble" type="PanelContainer" parent="CharacterButton" unique_id=352574128]

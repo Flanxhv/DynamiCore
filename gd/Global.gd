@@ -14,12 +14,37 @@ var song_list: Array = [
 		"title": "Tablear",
 		"artist": "kuro",
 		"charter": "flanxhv",
-		# ★ 關鍵：這裡的路徑全部指向 res:// 
 		"folder_path": "res://built_in_songs/base_tablear/",
 		"audio_path": "res://built_in_songs/base_tablear/music.mp3", # 或 .mp3
 		"preview_path": "res://built_in_songs/base_tablear/preview.mp3",
 		"cover_path": "res://built_in_songs/base_tablear/cover.jpg",
 		"difficulty": ["GIGA 15"], # 填入這首歌有的難度
+		"ranked": false,
+		"loved": false
+	},
+	{
+		"id": "base_song_02", # 確保有給一個唯一的 ID 用來存分數
+		"title": "edge of the sky",
+		"artist": "Ashen Blood",
+		"charter": "flanxhv",
+		"folder_path": "res://built_in_songs/base_edgeofthesky/",
+		"audio_path": "res://built_in_songs/base_edgeofthesky/music.mp3", # 或 .mp3
+		"preview_path": "res://built_in_songs/base_edgeofthesky/music.mp3",
+		"cover_path": "res://built_in_songs/base_edgeofthesky/cover.png",
+		"difficulty": ["MEGA 14"], # 填入這首歌有的難度
+		"ranked": false,
+		"loved": false
+	},
+	{
+		"id": "base_song_03", # 確保有給一個唯一的 ID 用來存分數
+		"title": "Rain then clear",
+		"artist": "kuro",
+		"charter": "flanxhv",
+		"folder_path": "res://built_in_songs/base_3/",
+		"audio_path": "res://built_in_songs/base_3/music.mp3", # 或 .mp3
+		"preview_path": "res://built_in_songs/base_3/music.mp3",
+		"cover_path": "res://built_in_songs/base_3/cover.png",
+		"difficulty": ["MEGA 13"], # 填入這首歌有的難度
 		"ranked": false,
 		"loved": false
 	}
