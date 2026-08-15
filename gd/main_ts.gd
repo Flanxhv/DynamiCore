@@ -81,7 +81,7 @@ var time_offset: float = 0.0
 
 func _ready():
 	# 1. 確保有拿到歌曲資料 (防呆機制)
-	speed = 1900.0 + 100.0 * Global.note_speed_mult
+	speed = 1200.0 + 300.0 * Global.note_speed_mult
 	var required_lead_time = 1200.0 / speed
 	
 	# 我們取 2.0 秒或是 required_lead_time 兩者之間比較大的那個
@@ -89,7 +89,7 @@ func _ready():
 	spawn_lead_time = max(2.0, required_lead_time)
 	if Global.current_song_data.is_empty():
 		print("沒有歌曲資料！退回主選單...")
-		get_tree().change_scene_to_file("uid://dnda82ibqdnuq")
+		get_tree().change_scene_to_file("uid://nfkrp5p1relk")
 		return
 	
 	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
@@ -479,8 +479,11 @@ func spawn_note(n, current_time):
 	new_note.tail_time = n.tail_real_time 
 	
 	var time_diff = n.real_time - current_time
-	new_note.position.y = -(time_diff * 2000.0 * Global.note_speed_mult)
+	var base_speed = 1200.0 # 預設最低速度
+	var speed_per_tick = 300.0 # 每 1x 倍率增加的速度
+	var current_drop_speed = base_speed + (speed_per_tick * Global.note_speed_mult)
 	
+	new_note.position.y = -(time_diff * current_drop_speed)
 	# 將 XML 的「左邊緣座標」轉換回「真正的中心點座標」
 	var actual_center_pos = n.position + (n.width / 2.0)
 	
@@ -513,31 +516,33 @@ func _unhandled_input(event):
 
 	# 1. 處理真實的手指觸控
 	if event is InputEventScreenTouch:
-		has_touch_screen = true # ★ 只要摸過螢幕，就標記這台裝置有觸控功能！
+		has_touch_screen = true # ★ 只要摸過螢幕，就標記這台裝置有觸控功能
 		if event.pressed:
 			active_touches[event.index] = event.position
 			try_hit_note(event.position) 
 		else:
 			active_touches.erase(event.index) 
+			# ★ 終極防護：只要手放開，強制把可能卡住的假滑鼠也清掉
+			active_touches.erase(-1)
 			
 	elif event is InputEventScreenDrag:
 		active_touches[event.index] = event.position
 		
 	# 2. 處理滑鼠點擊 (加入過濾機制)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if has_touch_screen:
-			return # ★ 核心防呆：既然是用手指玩的，就直接無視引擎偷偷模擬出來的滑鼠點擊！
-			
 		if event.pressed:
+			if has_touch_screen:
+				return # 已經確認是觸控設備了，拒絕新增假滑鼠點擊
 			var mouse_pos = get_global_mouse_position()
 			active_touches[-1] = mouse_pos 
 			try_hit_note(mouse_pos)
 		else:
+			# ★ 核心修正：放開滑鼠時，無條件清除 -1！不再被 has_touch_screen 阻擋！
 			active_touches.erase(-1)
 			
 	elif event is InputEventMouseMotion:
 		if has_touch_screen:
-			return # ★ 同理，無視模擬出來的滑鼠移動
+			return 
 			
 		if active_touches.has(-1):
 			active_touches[-1] = get_global_mouse_position()
@@ -1001,7 +1006,7 @@ func _on_restart_button_pressed():
 
 func _on_quit_button_pressed():
 	#back to Song Select
-	Transition.change_scene("uid://dcrdq7tlb21h")
+	Transition.change_scene("uid://nfkrp5p1relk")
 
 func _play_ap_animation():
 	# 1. 初始化狀態
@@ -1080,7 +1085,7 @@ func _show_result_screen():
 		final_score = 0
 		rank = "AUTO"
 		rank_color = "#00FFFF" # 青藍色專屬標籤
-		result_details_label.text = "AUTO PLAY\n\nPERFECT: %d\nGOOD: 0\nMISS: 0" %total_notes_judged
+		result_details_label.text = "AUTO PLAY\n\nPERFECT: %d\nGOOD     : 0\nMISS     : 0" %total_notes_judged
 	else:
 		# 正常遊玩模式計分與存檔
 		if total_notes_judged > 0:
@@ -1243,3 +1248,25 @@ func _update_offset_label():
 		var current_offset = Global.current_song_data.get("song_offset", 0.0)
 		# 顯示到小數點後 3 位 (毫秒)
 		offset_label.text = "Offset\n%+.2fs" % current_offset
+
+func _notification(what):
+	# 當接收到「APP 進入背景 (手機端)」或「視窗失去焦點 (電腦端)」的系統通知時
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_force_pause()
+
+func _force_pause():
+	# 防呆 1：如果遊戲已經是暫停狀態，就不要重複觸發 (避免把原本的暫停搞亂)
+	if get_tree().paused:
+		return
+		
+	# 防呆 2：如果已經進入結算畫面，或是正在播 AP 動畫，絕對不要跳出暫停選單
+	if result_menu.visible or is_ap_animating:
+		return
+		
+	# 強制啟動暫停 (邏輯同你原本的 _on_pause_button_pressed)
+	get_tree().paused = true
+	audio_player.stream_paused = true
+	pause_menu.visible = true
+	
+	if pause_button:
+		pause_button.text = "▶"

@@ -1,0 +1,726 @@
+[gd_scene format=3 uid="uid://nfkrp5p1relk"]
+
+[ext_resource type="Script" uid="uid://dn3q7s32hw7ho" path="res://gd/song_select_new.gd" id="1_6kv0r"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_2i4wq"]
+[ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="3_i3ls5"]
+[ext_resource type="LabelSettings" uid="uid://dph0fjunkk5ps" path="res://tres/label_settings.tres" id="4_wvc22"]
+[ext_resource type="PackedScene" uid="uid://dp2xcfnf6hw3x" path="res://tscn/DiamondButton.tscn" id="5_2i4wq"]
+[ext_resource type="PackedScene" uid="uid://dg25jahmrk0i2" path="res://tscn/DifficultyTriangle.tscn" id="5_i3ls5"]
+[ext_resource type="Script" uid="uid://cwa4otqld6qbu" path="res://gd/marquee_label.gd" id="5_wvc22"]
+
+[sub_resource type="Gradient" id="Gradient_i3ls5"]
+colors = PackedColorArray(0, 0.85915905, 1, 1, 0, 0.48452926, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wvc22"]
+gradient = SubResource("Gradient_i3ls5")
+
+[sub_resource type="LabelSettings" id="LabelSettings_225vo"]
+font = ExtResource("3_i3ls5")
+font_size = 100
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_6kv0r"]
+font = ExtResource("2_2i4wq")
+font_size = 70
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2i4wq"]
+font = ExtResource("2_2i4wq")
+font_size = 42
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="LabelSettings" id="LabelSettings_i3ls5"]
+font = ExtResource("2_2i4wq")
+font_size = 36
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wvc22"]
+bg_color = Color(0.8006914, 0, 0, 0.624)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hms2r"]
+bg_color = Color(0.3083999, 0.30839992, 0.30839977, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ijodb"]
+bg_color = Color(0.07016479, 0.07016479, 0.07016479, 0.91800004)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_bottom_right = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nh5sm"]
+bg_color = Color(0.07016479, 0.07016479, 0.07016479, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_bottom_right = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u18oy"]
+bg_color = Color(0.16007765, 0.16007765, 0.16007765, 0.91800004)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_bottom_right = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_nh5sm"]
+font = ExtResource("2_2i4wq")
+font_size = 50
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_u18oy"]
+font = ExtResource("2_2i4wq")
+font_size = 50
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hms2r"]
+font = ExtResource("2_2i4wq")
+font_size = 50
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[node name="SongSelect" type="Control" unique_id=2106416534]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6kv0r")
+
+[node name="Backgrond" type="ColorRect" parent="." unique_id=532812660]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.795)
+
+[node name="BgCover" type="TextureRect" parent="." unique_id=818441308]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BgCoverA" type="TextureRect" parent="BgCover" unique_id=641816824]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BgCoverB" type="TextureRect" parent="BgCover" unique_id=1283792230]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="BgCover" unique_id=1163055499]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.16000001)
+
+[node name="ListBgMask" type="TextureRect" parent="." unique_id=1807994465]
+custom_minimum_size = Vector2(1000, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_wvc22")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1315450014]
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 80.0
+offset_top = 158.0
+offset_right = 1925.0
+grow_vertical = 2
+follow_focus = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer" unique_id=2000552319]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LeftTouchArea" type="Button" parent="." unique_id=366602552]
+visible = false
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 960.0
+grow_vertical = 2
+flat = true
+
+[node name="DifficultyBox" type="VBoxContainer" parent="." unique_id=1325995639]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.06458333
+anchor_top = 0.8518519
+anchor_right = 0.2703125
+anchor_bottom = 0.9527778
+offset_left = -2.0
+offset_top = -6.1035156e-05
+offset_right = -2.0
+metadata/_edit_use_anchors_ = true
+
+[node name="BackButton" type="Button" parent="." unique_id=243551692]
+custom_minimum_size = Vector2(350, 100)
+layout_mode = 1
+offset_right = 122.0
+offset_bottom = 59.0
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 40
+text = "Back"
+
+[node name="OpenSettingsBotton" type="Button" parent="." unique_id=1336469535]
+visible = false
+custom_minimum_size = Vector2(350, 100)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -199.0
+offset_bottom = 59.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 40
+text = "Settings"
+
+[node name="HighScoreLabel" type="Label" parent="." unique_id=1950485498]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.6203125
+anchor_top = 0.79907405
+anchor_right = 0.9791667
+anchor_bottom = 0.9759259
+offset_top = -25.0
+offset_bottom = -25.0
+label_settings = SubResource("LabelSettings_225vo")
+horizontal_alignment = 2
+vertical_alignment = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="PreviewPlayer" type="AudioStreamPlayer" parent="." unique_id=495184997]
+
+[node name="SearchBox" type="LineEdit" parent="." unique_id=1489168088]
+custom_minimum_size = Vector2(700, 100)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -102.0
+offset_right = 102.0
+offset_bottom = 59.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 40
+placeholder_text = "  Search(only title)"
+
+[node name="ToastLabel" type="Label" parent="." unique_id=516596667]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = ExtResource("4_wvc22")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomInfoContainer" type="VBoxContainer" parent="." unique_id=627909380]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = -260.0
+offset_right = 238.0
+offset_bottom = -85.0
+grow_vertical = 0
+
+[node name="MarqueeContainer" type="Control" parent="BottomInfoContainer" unique_id=1330414434]
+clip_contents = true
+custom_minimum_size = Vector2(1000, 80)
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="BottomInfoContainer/MarqueeContainer" unique_id=425011596]
+layout_mode = 0
+offset_right = 140.0
+offset_bottom = 71.0
+text = "Title"
+label_settings = SubResource("LabelSettings_6kv0r")
+script = ExtResource("5_wvc22")
+
+[node name="ArtistLabel" type="Label" parent="BottomInfoContainer" unique_id=763417161]
+layout_mode = 2
+text = "Artist"
+label_settings = SubResource("LabelSettings_2i4wq")
+
+[node name="CharterLabel" type="Label" parent="BottomInfoContainer" unique_id=978514082]
+layout_mode = 2
+text = "Chart by"
+label_settings = SubResource("LabelSettings_i3ls5")
+
+[node name="SongInfoPanel" type="Panel" parent="." unique_id=873842506]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="DifficultyTriangle" parent="SongInfoPanel" unique_id=1844563013 instance=ExtResource("5_i3ls5")]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -181.0
+offset_top = -181.0
+offset_right = 19.0
+offset_bottom = 19.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="GridContainer" type="GridContainer" parent="SongInfoPanel" unique_id=1821566782]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.7853982
+pivot_offset = Vector2(157.5, 157.5)
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+columns = 2
+
+[node name="DiamondButton1" parent="SongInfoPanel/GridContainer" unique_id=495659048 instance=ExtResource("5_2i4wq")]
+layout_mode = 2
+btn_text = "AUTO"
+active_color = Color(0.33890283, 0.9157799, 0.56201816, 1)
+
+[node name="DiamondButton2" parent="SongInfoPanel/GridContainer" unique_id=1257780371 instance=ExtResource("5_2i4wq")]
+layout_mode = 2
+btn_text = "LOVE"
+active_color = Color(1, 0.34237343, 0.67631733, 1)
+
+[node name="DiamondButton3" parent="SongInfoPanel/GridContainer" unique_id=1514282926 instance=ExtResource("5_2i4wq")]
+layout_mode = 2
+btn_text = "MIRROR"
+active_color = Color(0.6538066, 0.21802102, 1, 1)
+
+[node name="DiamondButton4" parent="SongInfoPanel/GridContainer" unique_id=1896972621 instance=ExtResource("5_2i4wq")]
+layout_mode = 2
+btn_text = "PLAY"
+active_color = Color(0, 1, 1, 1)
+
+[node name="FilterMenuBtn" type="Button" parent="." unique_id=896965600]
+custom_minimum_size = Vector2(350, 100)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -350.0
+offset_bottom = 100.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 40
+text = "≡Sort"
+
+[node name="FilterPanel" type="PanelContainer" parent="." unique_id=1782399459]
+visible = false
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -350.0
+offset_top = 100.0
+offset_bottom = -680.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FilterPanel" unique_id=1447732839]
+layout_mode = 2
+
+[node name="RankToggleBtn" type="Button" parent="FilterPanel/VBoxContainer" unique_id=746988183]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 28
+text = "Rank: ALL"
+
+[node name="LoveToggleBtn" type="Button" parent="FilterPanel/VBoxContainer" unique_id=772667980]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 28
+text = "Love: Off"
+
+[node name="SortToggleBtn" type="Button" parent="FilterPanel/VBoxContainer" unique_id=910581355]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 28
+text = "Sort: Default ↓"
+
+[node name="DeleteBtn" type="Button" parent="FilterPanel/VBoxContainer" unique_id=432707220]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_wvc22")
+text = "! Delete Song !"
+
+[node name="CustomConfirmDialog" type="ColorRect" parent="." unique_id=606538353]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.17923622, 0.17923622, 0.17923622, 0)
+
+[node name="DialogBox" type="Panel" parent="CustomConfirmDialog" unique_id=1274868907]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -200.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hms2r")
+
+[node name="MessageLabel" type="Label" parent="CustomConfirmDialog/DialogBox" unique_id=235636153]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -275.0
+offset_top = -45.0
+offset_right = 275.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+label_settings = ExtResource("4_wvc22")
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 6
+
+[node name="ConfirmBtn" type="Button" parent="CustomConfirmDialog/DialogBox" unique_id=484095143]
+layout_mode = 0
+offset_left = 145.0
+offset_top = 300.0
+offset_right = 305.0
+offset_bottom = 370.0
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 40
+text = "Yes"
+
+[node name="CancelBtn" type="Button" parent="CustomConfirmDialog/DialogBox" unique_id=1629080182]
+layout_mode = 0
+offset_left = 395.0
+offset_top = 300.0
+offset_right = 555.0
+offset_bottom = 370.0
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 40
+text = "No"
+
+[node name="BlockRect" type="ColorRect" parent="." unique_id=2010297016]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="SettingsPanel" type="ColorRect" parent="." unique_id=586845491]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -894.0
+offset_top = -503.5
+offset_right = 894.0
+offset_bottom = 503.5
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.186459, 0.18645903, 0.18645895, 0.91764706)
+
+[node name="CloseBotton" type="Button" parent="SettingsPanel" unique_id=970863307]
+layout_mode = 1
+offset_right = 306.0
+offset_bottom = 121.5
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_ijodb")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nh5sm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_u18oy")
+text = "<< BACK"
+
+[node name="SpeedSlider" type="HSlider" parent="SettingsPanel" unique_id=1874541235]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30425057
+anchor_top = 0.2676266
+anchor_right = 0.60906047
+anchor_bottom = 0.32373387
+offset_left = 5.0
+offset_top = 0.5
+offset_right = 5.0
+offset_bottom = 0.5
+min_value = 0.1
+max_value = 3.0
+step = 0.05
+value = 0.5
+metadata/_edit_use_anchors_ = true
+
+[node name="OffsetSlider" type="HSlider" parent="SettingsPanel" unique_id=155597112]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30704698
+anchor_top = 0.387289
+anchor_right = 0.6118568
+anchor_bottom = 0.44339624
+min_value = -1.0
+max_value = 1.0
+step = 0.01
+value = 0.5
+metadata/_edit_use_anchors_ = true
+
+[node name="BrightnessSlider" type="HSlider" parent="SettingsPanel" unique_id=993905201]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30704698
+anchor_top = 0.5064548
+anchor_right = 0.6118569
+anchor_bottom = 0.56256205
+max_value = 1.0
+step = 0.1
+metadata/_edit_use_anchors_ = true
+
+[node name="SpeedLabel" type="Label" parent="SettingsPanel" unique_id=1994266404]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.26812315
+anchor_right = 0.7544743
+anchor_bottom = 0.32423037
+offset_right = -6.1035156e-05
+label_settings = ExtResource("4_wvc22")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="OffsetLabel" type="Label" parent="SettingsPanel" unique_id=1988780127]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.387289
+anchor_right = 0.7544743
+anchor_bottom = 0.44339624
+offset_right = -6.1035156e-05
+label_settings = ExtResource("4_wvc22")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="BrightnessLabel" type="Label" parent="SettingsPanel" unique_id=1756972577]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.5064548
+anchor_right = 0.7544743
+anchor_bottom = 0.56256205
+offset_right = -6.1035156e-05
+label_settings = ExtResource("4_wvc22")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label1" type="Label" parent="SettingsPanel" unique_id=1783789267]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.26812315
+anchor_right = 0.26621923
+anchor_bottom = 0.32423037
+offset_right = 3.0517578e-05
+text = "Speed"
+label_settings = SubResource("LabelSettings_nh5sm")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Label2" type="Label" parent="SettingsPanel" unique_id=1220345907]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.387289
+anchor_right = 0.2664989
+anchor_bottom = 0.44339624
+offset_right = -3.0517578e-05
+text = "Offset"
+label_settings = SubResource("LabelSettings_u18oy")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Label3" type="Label" parent="SettingsPanel" unique_id=1927439723]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.5064548
+anchor_right = 0.26621923
+anchor_bottom = 0.56256205
+offset_right = -32.49997
+text = "BG Brightness"
+label_settings = SubResource("LabelSettings_hms2r")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="EffectSlider" type="HSlider" parent="SettingsPanel" unique_id=2027558526]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.30704698
+anchor_top = 0.62562066
+anchor_right = 0.6118569
+anchor_bottom = 0.6817279
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 0.1
+metadata/_edit_use_anchors_ = true
+
+[node name="EffectLabel" type="Label" parent="SettingsPanel" unique_id=1162543741]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.692953
+anchor_top = 0.62562066
+anchor_right = 0.7544743
+anchor_bottom = 0.6817279
+label_settings = ExtResource("4_wvc22")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label4" type="Label" parent="SettingsPanel" unique_id=1998233307]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.62562066
+anchor_right = 0.26621923
+anchor_bottom = 0.6817279
+offset_right = 3.0517578e-05
+text = "Effect Light"
+label_settings = SubResource("LabelSettings_hms2r")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="EffectStyleToggle" type="CheckButton" parent="SettingsPanel" unique_id=1269562394]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.29697987
+anchor_top = 0.7184707
+anchor_right = 0.34619686
+anchor_bottom = 0.8306852
+offset_right = -44.0
+offset_bottom = -56.5
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(2, 2)
+theme_override_fonts/font = ExtResource("2_2i4wq")
+theme_override_font_sizes/font_size = 50
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Label5" type="Label" parent="SettingsPanel" unique_id=651725347]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.07997763
+anchor_top = 0.7447865
+anchor_right = 0.26621923
+anchor_bottom = 0.8008937
+offset_right = 3.0517578e-05
+text = "Simple Effect"
+label_settings = SubResource("LabelSettings_hms2r")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]
