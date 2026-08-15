@@ -1,0 +1,61 @@
+name: Build Unsigned iOS IPA
+
+on:
+  workflow_dispatch: # 允許在網頁上手動點擊按鈕觸發打包
+
+jobs:
+  build-ios-unsigned:
+    runs-on: macos-latest
+
+    steps:
+      - name: 📥 取得專案程式碼
+        uses: actions/checkout@v4
+
+      - name: ⚙️ 下載與安裝 Godot 4.6 (包含匯出模板)
+        run: |
+          # 下載 Godot 4.6 執行檔
+          wget https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_macos.universal.zip
+          unzip Godot_v4.6-stable_macos.universal.zip
+          
+          # 下載並安裝 Godot 4.6 匯出模板
+          wget https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
+          unzip Godot_v4.6-stable_export_templates.tpz
+          mkdir -p ~/Library/Application\ Support/Godot/export_templates/4.6.stable
+          mv templates/* ~/Library/Application\ Support/Godot/export_templates/4.6.stable/
+
+      - name: 🛠️ 讓 Godot 產生 Xcode 專案
+        run: |
+          mkdir -p build/ios
+          # 使用無頭模式(headless)執行匯出
+          ./Godot.app/Contents/MacOS/Godot --headless --export-release "iOS" build/ios/project.xcodeproj
+
+      - name: 🏗️ 強制無簽署編譯 (Xcodebuild)
+        run: |
+          cd build/ios
+          # 動態抓取專案名稱
+          PROJECT_FILE=$(ls *.xcodeproj)
+          SCHEME_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
+          
+          # 呼叫 Xcode 進行無簽署編譯，並將編譯結果輸出到當前的 build 資料夾
+          xcodebuild -project "$PROJECT_FILE" \
+                     -scheme "$SCHEME_NAME" \
+                     -configuration Release \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGNING_ALLOWED=NO \
+                     SYMROOT="$(PWD)/xcode_build" \
+                     build
+
+      - name: 📦 將編譯結果打包成 .ipa 檔案
+        run: |
+          cd build/ios/xcode_build/Release-iphoneos/
+          mkdir Payload
+          # 將產生的 .app 放入 Payload 資料夾並壓縮，這就是 .ipa 的標準格式
+          cp -r *.app Payload/
+          zip -r unsigned_game.ipa Payload
+
+      - name: 🚀 輸出並供下載
+        uses: actions/upload-artifact@v4
+        with:
+          name: Godot-iOS-Unsigned-IPA
+          path: build/ios/xcode_build/Release-iphoneos/unsigned_game.ipa
