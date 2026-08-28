@@ -10,16 +10,15 @@ var effect_height_ratio = 1.0
 var hit_effect_style: bool = false
 var song_list: Array = [
 	{
-		"id": "base_song_01", # 確保有給一個唯一的 ID 用來存分數
-		"title": "Tablear",
+		"id": "base_song_03", # 確保有給一個唯一的 ID 用來存分數
+		"title": "Rain then clear",
 		"artist": "kuro",
-		"charter": "flanxhv",
-		# ★ 關鍵：這裡的路徑全部指向 res:// 
-		"folder_path": "res://built_in_songs/base_tablear/",
-		"audio_path": "res://built_in_songs/base_tablear/music.mp3", # 或 .mp3
-		"preview_path": "res://built_in_songs/base_tablear/preview.mp3",
-		"cover_path": "res://built_in_songs/base_tablear/cover.jpg",
-		"difficulty": ["GIGA 15"], # 填入這首歌有的難度
+		"charter": "flanxhv\n*Song copyright is held by the artist, and used in this game with permission.",
+		"folder_path": "res://built_in_songs/base_3/",
+		"audio_path": "res://built_in_songs/base_3/music.mp3", # 或 .mp3
+		"preview_path": "res://built_in_songs/base_3/music.mp3",
+		"cover_path": "res://built_in_songs/base_3/cover.png",
+		"difficulty": ["MEGA 13"], # 填入這首歌有的難度
 		"ranked": false,
 		"loved": false
 	}
