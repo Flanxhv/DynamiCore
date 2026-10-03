@@ -11,6 +11,8 @@ DynamiCore是音樂遊戲「Dynamix」的社區作品－－「Dynamite」的模�
 
 ## 使用資源
 * 遊戲內的雲端下載歌曲、譜面、曲繪等，皆是取用Dynamite-Explode的資源請求連結，具體可參考https://www.bilibili.com/opus/929119967227412502?from=search&spm_id_from=333.337.0.0
+* 更新：由於目前Dynamite Explode伺服器搬遷中，先前下載功能因此無法使用，目前將下載請求轉移至Reboot服務器（具體參考了https://www.bilibili.com/opus/1132741888552468497?from=search&spm_id_from=333.337.0.0）。據此，目前僅能下載Reboot服擁有的譜面。
+個人租借了一個簡易資料庫，目前會將請求完的譜面、音樂、封面等結果同步存放至該資料庫，即使Reboot伺服器出現突發意外，也還能下載這些曾請求過的譜面。
 * 主介面的BGM朧月，來自musmus(https://musmus.main.jp/piano.html)。
 
 ## 聲明
