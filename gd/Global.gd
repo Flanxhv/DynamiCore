@@ -21,7 +21,7 @@ var song_list: Array = [
 		"difficulty": ["MEGA 13"], # 填入這首歌有的難度
 		"ranked": false,
 		"loved": false
-	}
+	},
 ]
 var auto_play: bool = false
 var mirror_mode: bool = false
