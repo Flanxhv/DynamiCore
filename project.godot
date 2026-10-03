@@ -13,6 +13,7 @@ config_version=5
 config/name="DynamiCore"
 run/main_scene="uid://ca6jryylwq51b"
 config/features=PackedStringArray("4.6", "Mobile")
+boot_splash/show_image=false
 config/icon="uid://cypiexigh3318"
 
 [autoload]
@@ -22,6 +23,7 @@ Global="*uid://sy5bsb244ub3"
 UiSoundManager="*uid://c6naf4oasxl3u"
 BgmManager="*uid://d81jv3ah50p5"
 TouchEffectManager="*uid://b0suys6ue7e8b"
+Toast="*uid://b7h6cbtbrhajx"
 
 [display]
 
@@ -31,7 +33,7 @@ window/stretch/mode="canvas_items"
 
 [editor]
 
-movie_writer/movie_file="C:/Users/user/Downloads/movie_file/test.avi"
+movie_writer/movie_file="C:/Users/s0120/Downloads/DynamiCore/test.avi"
 
 [input_devices]
 

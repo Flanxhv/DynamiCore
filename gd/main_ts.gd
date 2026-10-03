@@ -19,29 +19,26 @@ var current_warning_idx: int = 0
 @onready var offset_label = $HUD/PauseMenu/OffsetLabel
 @onready var offset_minus_btn = $HUD/PauseMenu/OffsetMinusButton
 @onready var offset_plus_btn = $HUD/PauseMenu/OffsetPlusButton
-@onready var result_diff_line = $HUD/ResultMenu/SongNameRect2
 @onready var ap_particles = $HUD/AP_Overlay/AP_Center/AP_Particles
 @onready var song_label = $HUD/SongLabel
 @onready var progress_bar = $HUD/SongProgressBar
 @onready var background = $Background
 @onready var downrect = $DownRect
-@onready var result_menu = $HUD/ResultMenu
-@onready var result_score_label = $HUD/ResultMenu/ScoreLabel
-@onready var result_details_label = $HUD/ResultMenu/DetailsLabel
-@onready var res_restart_btn = $HUD/ResultMenu/RestartButton
-@onready var res_quit_btn = $HUD/ResultMenu/QuitButton
+@onready var result_screen = $ResultScreen
 @onready var combo_label = $HUD/ComboLabel
 @onready var audio_player = $AudioStreamPlayer
+
 @onready var track_bottom = $BottomTrack
 @onready var track_left = $LeftTrack
 @onready var track_right = $RightTrack
 @onready var judgement_label = $HUD/JudgmentLabel
 @onready var stats_label = $HUD/StatsLabel
+
 @onready var pause_button = $HUD/PauseButton
 @onready var pause_menu = $HUD/PauseMenu
 @onready var restart_button = $HUD/PauseMenu/RestartButton
 @onready var quit_button = $HUD/PauseMenu/QuitButton
-@onready var result_song_label = $HUD/ResultMenu/SongNameLabel
+
 @onready var ap_overlay = $HUD/AP_Overlay
 @onready var ap_dim_bg = $HUD/AP_Overlay/DimBackground
 @onready var ap_center = $HUD/AP_Overlay/AP_Center
@@ -49,7 +46,7 @@ var current_warning_idx: int = 0
 @onready var ap_bottom_line = $HUD/AP_Overlay/AP_Center/BottomLine
 @onready var ap_label = $HUD/AP_Overlay/AP_Center/AP_Label
 
-
+var is_game_ended: bool = false
 # ★ 新增：用來記錄整局的判定數量
 var judge_stats = {"PERFECT": 0, "GOOD": 0, "MISS": 0}
 var tween_combo: Tween
@@ -81,15 +78,15 @@ var time_offset: float = 0.0
 
 func _ready():
 	# 1. 確保有拿到歌曲資料 (防呆機制)
-	speed = 1900.0 + 100.0 * Global.note_speed_mult
+	speed = 1200.0 + 300.0 * Global.note_speed_mult
 	var required_lead_time = 1200.0 / speed
 	
 	# 我們取 2.0 秒或是 required_lead_time 兩者之間比較大的那個
 	# 這樣就算玩家速度調超快 (只需 0.5 秒就掉下來)，系統依然會提早 2 秒生成，保留緩衝效能
 	spawn_lead_time = max(2.0, required_lead_time)
 	if Global.current_song_data.is_empty():
-		print("沒有歌曲資料！退回主選單...")
-		get_tree().change_scene_to_file("uid://dnda82ibqdnuq")
+		Toast.show_toast("The data of the song is broken.")
+		get_tree().change_scene_to_file("uid://nfkrp5p1relk")
 		return
 	
 	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
@@ -110,14 +107,13 @@ func _ready():
 	var chart_path = Global.current_chart_path
 	var audio_path = Global.current_song_data["audio_path"]
 	song_label.text = Global.current_song_data["title"]
-	print("即將遊玩: ", Global.current_song_data["title"])
 	
 	# 2. 動態載入音樂檔案並放進 AudioStreamPlayer
 	var audio_stream = load_external_audio(audio_path)
 	if audio_stream:
 		audio_player.stream = audio_stream
 	else:
-		print("找不到音樂檔案！請檢查路徑：", audio_path)
+		Toast.show_toast("Cannot found the music file："+audio_path)
 		
 	# 3. 解析對應的 XML 譜面
 	parse_dynamix_xml(chart_path)
@@ -166,7 +162,7 @@ func _ready():
 	btn_style.set_corner_radius_all(8)             # 圓角 8px
 	
 	# 將這個樣式強制套用到「重新開始」和「退出」按鈕的所有狀態
-	var target_buttons = [restart_button, quit_button,res_quit_btn,res_restart_btn]
+	var target_buttons = [restart_button, quit_button]
 	
 	for btn in target_buttons:
 		if btn != null:
@@ -187,8 +183,6 @@ func _ready():
 	pause_button.pressed.connect(_on_pause_button_pressed)
 	restart_button.pressed.connect(_on_restart_button_pressed) #
 	quit_button.pressed.connect(_on_quit_button_pressed)
-	res_restart_btn.pressed.connect(_on_restart_button_pressed)
-	res_quit_btn.pressed.connect(_on_quit_button_pressed)
 	audio_player.finished.connect(_on_audio_finished)
 	_init_blur_material()
 
@@ -228,7 +222,7 @@ func _prepare_track_warnings():
 func parse_dynamix_xml(file_path: String):
 	var parser = XMLParser.new()
 	if parser.open(file_path) != OK:
-		print("無法開啟譜面檔案！")
+		Toast.show_toast("Illegal chart file.")
 		return
 
 	var current_side = "bottom"
@@ -479,8 +473,11 @@ func spawn_note(n, current_time):
 	new_note.tail_time = n.tail_real_time 
 	
 	var time_diff = n.real_time - current_time
-	new_note.position.y = -(time_diff * 2000.0 * Global.note_speed_mult)
+	var base_speed = 1200.0 # 預設最低速度
+	var speed_per_tick = 300.0 # 每 1x 倍率增加的速度
+	var current_drop_speed = base_speed + (speed_per_tick * Global.note_speed_mult)
 	
+	new_note.position.y = -(time_diff * current_drop_speed)
 	# 將 XML 的「左邊緣座標」轉換回「真正的中心點座標」
 	var actual_center_pos = n.position + (n.width / 2.0)
 	
@@ -513,31 +510,33 @@ func _unhandled_input(event):
 
 	# 1. 處理真實的手指觸控
 	if event is InputEventScreenTouch:
-		has_touch_screen = true # ★ 只要摸過螢幕，就標記這台裝置有觸控功能！
+		has_touch_screen = true # ★ 只要摸過螢幕，就標記這台裝置有觸控功能
 		if event.pressed:
 			active_touches[event.index] = event.position
 			try_hit_note(event.position) 
 		else:
 			active_touches.erase(event.index) 
+			# ★ 終極防護：只要手放開，強制把可能卡住的假滑鼠也清掉
+			active_touches.erase(-1)
 			
 	elif event is InputEventScreenDrag:
 		active_touches[event.index] = event.position
 		
 	# 2. 處理滑鼠點擊 (加入過濾機制)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if has_touch_screen:
-			return # ★ 核心防呆：既然是用手指玩的，就直接無視引擎偷偷模擬出來的滑鼠點擊！
-			
 		if event.pressed:
+			if has_touch_screen:
+				return # 已經確認是觸控設備了，拒絕新增假滑鼠點擊
 			var mouse_pos = get_global_mouse_position()
 			active_touches[-1] = mouse_pos 
 			try_hit_note(mouse_pos)
 		else:
+			# ★ 核心修正：放開滑鼠時，無條件清除 -1！不再被 has_touch_screen 阻擋！
 			active_touches.erase(-1)
 			
 	elif event is InputEventMouseMotion:
 		if has_touch_screen:
-			return # ★ 同理，無視模擬出來的滑鼠移動
+			return 
 			
 		if active_touches.has(-1):
 			active_touches[-1] = get_global_mouse_position()
@@ -1001,7 +1000,7 @@ func _on_restart_button_pressed():
 
 func _on_quit_button_pressed():
 	#back to Song Select
-	Transition.change_scene("uid://dcrdq7tlb21h")
+	Transition.change_scene("uid://nfkrp5p1relk")
 
 func _play_ap_animation():
 	# 1. 初始化狀態
@@ -1052,6 +1051,11 @@ func _play_ap_animation():
 # ★ 結算畫面核心邏輯
 # ==========================================
 func _show_result_screen():
+	if is_game_ended:
+		return
+	is_game_ended = true
+	
+	print(">> 觸發結算畫面 (僅限一次) <<")
 	get_tree().paused = true
 	pause_button.visible = false
 	track_bottom.visible = false
@@ -1062,103 +1066,12 @@ func _show_result_screen():
 	stats_label.visible = false
 	downrect.visible = false
 	song_label.visible = false
-	
-	var total_notes_judged = judge_stats["PERFECT"] + judge_stats["GOOD"] + judge_stats["MISS"]
-	var final_score = 0
-	var rank = "F"
-	var rank_color = "#FFFFFF" 
-	
-	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
-	var diff_type = Global.current_chart_path.get_file().get_basename()
-	if result_diff_line != null:
-		var diff_color = _get_diff_color(diff_type)
-		result_diff_line.color = diff_color
-	# ==========================================
-	# ★ AUTO 模式結算攔截：顯示 AUTO 且不儲存分數
-	# ==========================================
-	if Global.auto_play:
-		final_score = 0
-		rank = "AUTO"
-		rank_color = "#00FFFF" # 青藍色專屬標籤
-		result_details_label.text = "AUTO PLAY\n\nPERFECT: %d\nGOOD: 0\nMISS: 0" %total_notes_judged
-	else:
-		# 正常遊玩模式計分與存檔
-		if total_notes_judged > 0:
-			var raw_score = (judge_stats["PERFECT"] * 1.0 + judge_stats["GOOD"] * 0.65) / total_notes_judged
-			final_score = int(raw_score * 1000000)
-			
-		if Global.has_method("save_new_score"):
-			Global.save_new_score(song_id, diff_type, final_score)
-			
-		if final_score >= 1000000:
-			rank = "Ω"
-			rank_color = "#4DFFFF"
-		elif final_score >= 990000:
-			rank = "Ψ"
-			rank_color = "#FFFF37" 
-		elif final_score >= 980000:
-			rank = "Χ"
-			rank_color = "#FF0000" 
-		elif final_score >= 960000:
-			rank = "A"
-			rank_color = "#FFDC35"
-		elif final_score >= 900000:
-			rank = "B"
-			rank_color = "#73BF00"
-		elif final_score >= 800000:
-			rank = "C"
-			rank_color = "#0066CC"
-		elif final_score >= 700000:
-			rank = "D"
-			rank_color = "#8B4513"
-		elif final_score >= 600000:
-			rank = "E"
-			rank_color = "#A9A9A9"
-		else:
-			rank = "F"
-			rank_color = "#000000"
-		
-		result_details_label.text = "MAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
-			max_combo,
-			judge_stats["PERFECT"],
-			judge_stats["GOOD"],
-			judge_stats["MISS"]
-		]
-		
-		if judge_stats["MISS"] == 0 and total_notes_judged > 0:
-			if judge_stats["GOOD"] == 0:
-				result_details_label.text = "ALL PERFECT\n\nMAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
-					max_combo,
-					judge_stats["PERFECT"],
-					judge_stats["GOOD"],
-					judge_stats["MISS"]
-				]
-			else:
-				result_details_label.text = "FULL COMBO\n\nMAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
-					max_combo,
-					judge_stats["PERFECT"],
-					judge_stats["GOOD"],
-					judge_stats["MISS"]
-				]
-				
-		
-	# ==========================================
+	if progress_bar:          # ★ 補上這行，將進度條隱藏
+		progress_bar.visible = false
 
-	result_song_label.text = Global.current_song_data["title"]
-	result_score_label.text = "[left]SCORE: %07d\nRANK : [color=%s]%s[/color][/left]" % [final_score, rank_color, rank]
+	# 呼叫獨立場景展示結果
+	result_screen.setup_and_show(judge_stats, max_combo)
 	
-	result_menu.modulate.a = 0.0 
-	result_menu.scale = Vector2(0.8, 0.8) 
-	result_menu.pivot_offset = result_menu.size / 2.0 
-	result_menu.process_mode = Node.PROCESS_MODE_ALWAYS 
-	result_menu.visible = true
-	
-	var tween = create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) 
-	tween.set_parallel(true) 
-	tween.tween_property(result_menu, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.tween_property(result_menu, "scale", Vector2.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
 func load_external_audio(path: String) -> AudioStream:
 	if path.begins_with("res://"):
 		return load(path)
@@ -1243,3 +1156,19 @@ func _update_offset_label():
 		var current_offset = Global.current_song_data.get("song_offset", 0.0)
 		# 顯示到小數點後 3 位 (毫秒)
 		offset_label.text = "Offset\n%+.2fs" % current_offset
+
+func _notification(what):
+	# 當接收到「APP 進入背景 (手機端)」或「視窗失去焦點 (電腦端)」的系統通知時
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_force_pause()
+
+func _force_pause():
+	if get_tree().paused:
+		return
+	if result_screen.visible or is_ap_animating:
+		return
+	get_tree().paused = true
+	audio_player.stream_paused = true
+	pause_menu.visible = true
+	if pause_button:
+		pause_button.text = "▶"

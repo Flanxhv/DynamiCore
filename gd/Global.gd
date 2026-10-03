@@ -10,16 +10,15 @@ var effect_height_ratio = 1.0
 var hit_effect_style: bool = false
 var song_list: Array = [
 	{
-		"id": "base_song_01", # 確保有給一個唯一的 ID 用來存分數
-		"title": "Tablear",
+		"id": "base_song_03", # 確保有給一個唯一的 ID 用來存分數
+		"title": "Rain then clear",
 		"artist": "kuro",
-		"charter": "flanxhv",
-		# ★ 關鍵：這裡的路徑全部指向 res:// 
-		"folder_path": "res://built_in_songs/base_tablear/",
-		"audio_path": "res://built_in_songs/base_tablear/music.mp3", # 或 .mp3
-		"preview_path": "res://built_in_songs/base_tablear/preview.mp3",
-		"cover_path": "res://built_in_songs/base_tablear/cover.jpg",
-		"difficulty": ["GIGA 15"], # 填入這首歌有的難度
+		"charter": "flanxhv\n*Song copyright is held by the artist, and used in this game with permission.",
+		"folder_path": "res://built_in_songs/base_3/",
+		"audio_path": "res://built_in_songs/base_3/music.mp3", # 或 .mp3
+		"preview_path": "res://built_in_songs/base_3/music.mp3",
+		"cover_path": "res://built_in_songs/base_3/cover.png",
+		"difficulty": ["MEGA 13"], # 填入這首歌有的難度
 		"ranked": false,
 		"loved": false
 	}
@@ -32,6 +31,7 @@ var last_selected_song_id: String = ""
 var last_selected_diff_index: int = 0
 var settings_path = "user://settings.json"
 
+const SAVE_PATH = "user://records.cfg"
 # ==========================================
 # ★ 新增：單曲專屬校準值的存檔路徑與變數
 # ==========================================
@@ -51,19 +51,60 @@ func load_scores():
 		if data != null:
 			player_scores = data
 
-func save_new_score(song_id: String, diff_type: String, new_score: int):
+func save_new_score(song_id: String, diff_type: String, score_data: Dictionary):
 	if not player_scores.has(song_id):
 		player_scores[song_id] = {}
 		
-	var current_high = player_scores[song_id].get(diff_type, 0)
+	# 取得目前的歷史最高分（相容舊版直接存 int 的情況）
+	var old_record = player_scores[song_id].get(diff_type, 0)
+	var current_high_score: int = 0
 	
-	if new_score > current_high:
-		player_scores[song_id][diff_type] = new_score
+	if typeof(old_record) == TYPE_DICTIONARY:
+		current_high_score = old_record.get("score", 0)
+	elif typeof(old_record) == TYPE_INT or typeof(old_record) == TYPE_FLOAT:
+		current_high_score = int(old_record)
+
+	var new_score: int = score_data.get("score", 0)
+
+	# 只有突破最高分時才更新存檔
+	if new_score > current_high_score:
+		player_scores[song_id][diff_type] = {
+			"score": new_score,
+			"rank": score_data.get("rank", "F"),
+			"max_combo": score_data.get("max_combo", 0),
+			"perfect": score_data.get("perfect", 0),
+			"good": score_data.get("good", 0),
+			"miss": score_data.get("miss", 0)
+		}
 		
 		# 寫入硬碟
 		var file = FileAccess.open(save_path, FileAccess.WRITE)
-		file.store_string(JSON.stringify(player_scores))
-		file.close()
+		if file:
+			file.store_string(JSON.stringify(player_scores, "\t")) # "\t" 讓 json 排版好讀
+			file.close()
+			print("🏆 刷新最高分並寫入存檔：", new_score)
+
+# ★ 新增：供其他場景（例如選曲畫面、結算面板）調取資料的方法
+func get_song_score_data(song_id: String, diff_type: String) -> Dictionary:
+	if not player_scores.has(song_id):
+		return {}
+	
+	var record = player_scores[song_id].get(diff_type, null)
+	if record == null:
+		return {}
+		
+	# 相容舊存檔只有純整數分數的狀況
+	if typeof(record) == TYPE_INT or typeof(record) == TYPE_FLOAT:
+		return {
+			"score": int(record),
+			"rank": "F",
+			"max_combo": 0,
+			"perfect": 0,
+			"good": 0,
+			"miss": 0
+		}
+		
+	return record
 
 func save_settings():
 	var settings_data = {

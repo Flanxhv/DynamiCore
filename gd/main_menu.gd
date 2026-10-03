@@ -6,7 +6,11 @@ func _ready() :
 	
 func _on_play_button_pressed():
 	# 切換到選曲頁面
-	Transition.change_scene("uid://dcrdq7tlb21h")
+	#Transition.change_scene("uid://dcrdq7tlb21h")
+	
+	#beta
+	BgmManager.stop_bgm()
+	Transition.change_scene("uid://nfkrp5p1relk")
 
 func _on_chart_button_pressed():
 	# Chart Download

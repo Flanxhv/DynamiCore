@@ -11,7 +11,7 @@ shader_parameter/rows = 27.0
 
 [node name="Transition" type="CanvasLayer" unique_id=935804691]
 process_mode = 3
-layer = 100
+layer = 400
 script = ExtResource("1_ws5yv")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=640576455]

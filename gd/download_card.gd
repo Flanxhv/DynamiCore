@@ -78,7 +78,7 @@ func _on_download_pressed():
 		download_btn.text = "No Music"
 		return
 		
-	print("開始下載：", song_data["title"])
+	Toast.show_toast("Downloading:"+song_data["title"],1.5)
 	download_btn.disabled = true
 	
 	var target_folder = "user://songs/" + song_data["id"] + "/"
@@ -106,7 +106,8 @@ func _load_thumbnail_async():
 			var tex = ImageTexture.create_from_image(img)
 			_fade_in_thumbnail(tex)
 		return
-		
+	await get_tree().create_timer(randf_range(0.05, 0.5)).timeout
+	if not is_inside_tree(): return # 避免節點已被銷毀
 	var http_request = HTTPRequest.new()
 	add_child(http_request)
 	
@@ -124,15 +125,17 @@ func _load_thumbnail_async():
 		var img = Image.new()
 		var decode_err = FAILED
 		
-		# ★ 核心魔法：讀取檔案的 Magic Bytes 來精準判斷圖片格式
-		if body[0] == 0x89 and body[1] == 0x50 and body[2] == 0x4E and body[3] == 0x47:
-			decode_err = img.load_png_from_buffer(body)   # 這是 PNG
-		elif body[0] == 0xFF and body[1] == 0xD8:
-			decode_err = img.load_jpg_from_buffer(body)   # 這是 JPG
-		elif body[0] == 0x52 and body[1] == 0x49: 
-			decode_err = img.load_webp_from_buffer(body)  # 這是 WEBP (RIFF)
+		# 1. 直接嘗試 Godot 內建的三種格式解碼（不要只看前兩個 byte，避免特定 header 誤判）
+		if img.load_jpg_from_buffer(body) == OK:
+			decode_err = OK
+		elif img.load_png_from_buffer(body) == OK:
+			decode_err = OK
+		elif img.load_webp_from_buffer(body) == OK:
+			decode_err = OK
 		else:
-			print("❌ 未知的圖片格式，可能抓到錯誤網頁。標頭：", body[0], " ", body[1])
+			# 印出前 100 個字元，立刻知道是 HTML 還是什麼內容
+			print("❌ 解碼失敗，前 100 字元：", body.slice(0, 100).get_string_from_utf8())
+			print("❌ 檔案前 4 個 Byte 十六進位：", "%X %X %X %X" % [body[0], body[1], body[2], body[3]])
 			
 		if decode_err == OK:
 			img.resize(384, 216, Image.INTERPOLATE_BILINEAR)
@@ -142,16 +145,12 @@ func _load_thumbnail_async():
 		else:
 			print("❌ 圖片解碼失敗，檔案大小：", body.size(), " bytes")
 
-# 讓圖片出現時帶有高級淡入特效
 func _fade_in_thumbnail(tex: Texture2D):
 	cover_image.texture = tex
-	cover_image.modulate.a = 0.0 # 先全透明
+	cover_image.modulate.a = 0.0 
 	var tween = create_tween()
 	tween.tween_property(cover_image, "modulate:a", 1.0, 0.4) # 0.4秒淡入
 
-# ==========================================
-# ★ 循序漸進的異步檔案下載器
-# ==========================================
 # ==========================================
 # ★ 循序漸進的異步檔案下載器
 # ==========================================
@@ -178,7 +177,7 @@ func _download_all_files(folder: String):
 		
 	if success:
 		download_btn.text = "Got！"
-		print("🎉 歌曲安裝完成！已存入：", folder)
+		Toast.show_toast("Download successed: "+song_data["title"],1.5)
 		
 		var meta_path = folder + "meta.json"
 		var meta_file = FileAccess.open(meta_path, FileAccess.WRITE)
@@ -189,7 +188,7 @@ func _download_all_files(folder: String):
 	else:
 		download_btn.text = "Failed!"
 		download_btn.disabled = false
-		print("❌ 歌曲下載過程發生錯誤")
+		print("Download failed: "+song_data["title"])
 
 # ★ 新增了 is_image 參數
 func _download_single_file(url: String, save_path: String, is_image: bool) -> bool:
@@ -202,7 +201,7 @@ func _download_single_file(url: String, save_path: String, is_image: bool) -> bo
 	
 	var err = request.request(url)
 	if err != OK:
-		print("❌ 無法發起網路請求：", url)
+		Toast.show_toast("Request failed: "+url,1.5)
 		request.queue_free()
 		return false
 		
@@ -225,7 +224,7 @@ func _download_single_file(url: String, save_path: String, is_image: bool) -> bo
 				return false
 		return true
 	else:
-		print("❌ 伺服器回傳錯誤代碼 (", response_code, ") 網址：", url)
+		print("Error: ", response_code, " Website：", url)
 		if FileAccess.file_exists(save_path):
 			DirAccess.remove_absolute(save_path)
 		return false

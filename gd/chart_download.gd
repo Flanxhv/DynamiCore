@@ -28,8 +28,7 @@ func _ready():
 	cloud_downloader.request_completed.connect(_on_list_downloaded)
 	
 	# 向你的 JSON 網址發送請求
-	var url = "https://pub-19d1e53d80d84a4498c2b40adbfe578b.r2.dev/cloud_songs.json"
-	print("📡 正在獲取雲端譜面列表...")
+	var url = "https://pub-19d1e53d80d84a4498c2b40adbfe578b.r2.dev/songs_list.json"
 	cloud_downloader.request(url)
 	
 func _on_search_text_changed(query: String = ""):
@@ -78,9 +77,9 @@ func _on_list_downloaded(result, response_code, headers, body):
 			var initial_query = search_box.text if search_box else ""
 			_on_search_text_changed(initial_query)
 		else:
-			print("JSON 解析失敗")
+			Toast.show_toast("Load failed: songs_list.json")
 	else:
-		print("網路請求失敗: ", response_code)
+		Toast.show_toast("Request failed. Error code: "+response_code)
 
 # ==========================================
 # ★ 縱二橫向卷軸生成器
