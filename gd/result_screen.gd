@@ -38,8 +38,7 @@ func _setup_button_styles() -> void:
 			btn.add_theme_color_override("font_hover_color", Color.WHITE)
 			btn.add_theme_color_override("font_pressed_color", Color.GRAY)
 
-func setup_and_show(judge_stats: Dictionary, max_combo: int) -> void:
-	print("--- 真正進入了 ResultScreen 的 setup_and_show ---")
+func setup_and_show(judge_stats: Dictionary, max_combo: int, timing_stats: Dictionary = {"EARLY": 0, "LATE": 0}) -> void:
 	var total_notes_judged = judge_stats["PERFECT"] + judge_stats["GOOD"] + judge_stats["MISS"]
 	var final_score = 0
 	var rank = "F"
@@ -55,7 +54,7 @@ func setup_and_show(judge_stats: Dictionary, max_combo: int) -> void:
 		final_score = 0
 		rank = "AUTO"
 		rank_color = "#00FFFF"
-		result_details_label.text = "AUTO PLAY\n\nPERFECT: %d\nGOOD     : 0\nMISS     : 0" % total_notes_judged
+		result_details_label.text = "%d\n\n0\n\n0\n\nAUTO PLAY\n\n0/0" % total_notes_judged
 	else:
 		if total_notes_judged > 0:
 			var raw_score = (judge_stats["PERFECT"] * 1.0 + judge_stats["GOOD"] * 0.65) / total_notes_judged
@@ -89,43 +88,36 @@ func setup_and_show(judge_stats: Dictionary, max_combo: int) -> void:
 			rank = "F"
 			rank_color = "#000000"
 		
-		var prefix = ""
-		if judge_stats["MISS"] == 0 and total_notes_judged > 0:
-			prefix = "ALL PERFECT\n\n" if judge_stats["GOOD"] == 0 else "FULL COMBO\n\n"
-			
-		result_details_label.text = prefix + "MAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
-			max_combo,
+		var early_count = timing_stats.get("EARLY", 0)
+		var late_count = timing_stats.get("LATE", 0)
+
+		result_details_label.text = "%d\n\n%d\n\n%d\n\n%d\n\n%d/%d" % [
 			judge_stats["PERFECT"],
 			judge_stats["GOOD"],
-			judge_stats["MISS"]
+			judge_stats["MISS"],
+			max_combo,
+			early_count,
+			late_count
 		]
 
 	result_song_label.text = Global.current_song_data.get("title", "")
-	result_score_label.text = "[left]SCORE: %07d\nRANK : [color=%s]%s[/color][/left]" % [final_score, rank_color, rank]
-	
+	result_score_label.text = "[left]%07d\n\n[color=%s]%s[/color][/left]" % [final_score, rank_color, rank]
 	
 	visible = true
 	result_menu.visible = true
 	
-	# 1. 重設縮放中心點為面板正中央（縮放動畫才有打擊感）
 	result_menu.pivot_offset = result_menu.size / 2.0
-	
-	# 2. 設定動畫起始狀態（縮小到 0.8 倍且全透明）
 	result_menu.scale = Vector2(0.8, 0.8)
 	result_menu.modulate.a = 0.0
-	
-	# 3. 建立並播放彈出動畫
+
 	var tween = create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) # 確保全域暫停下也能跑
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.set_parallel(true)
 	
-	# 0.4 秒淡入
 	tween.tween_property(result_menu, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	# 0.4 秒彈出（TRANS_BACK 會帶有彈性回彈效果）
 	tween.tween_property(result_menu, "scale", Vector2.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	
 	if not Global.auto_play:
-		# 打包本次成績數據
 		var current_result_data = {
 			"score": final_score,
 			"rank": rank,
@@ -134,8 +126,7 @@ func setup_and_show(judge_stats: Dictionary, max_combo: int) -> void:
 			"good": judge_stats["GOOD"],
 			"miss": judge_stats["MISS"]
 		}
-		
-		# 呼叫 Global 寫入
+
 		Global.save_new_score(song_id, diff_type, current_result_data)
 		
 func _get_diff_color(diff_raw: String) -> Color:

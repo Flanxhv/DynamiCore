@@ -1,47 +1,83 @@
 extends TextureButton
 
-@export var texts: Array[String] = [
-	"很久很久以前，有一顆紫色的半球...",
-	"占位符2",
-	"占位符3"
-]
+
+# 定義單個對話群組的資料結構
+# Resource 允許直接在 Inspector 中儲存與編輯
+@export var dialogue_groups: Array[DialogueGroup] = []
 
 @onready var bubble: PanelContainer = $Bubble
 @onready var label: Label = $Bubble/MarginContainer/Label
 
 var is_bubble_open: bool = false
+var active_tween: Tween
+
+# 播放狀態追蹤
+var current_group: DialogueGroup = null
+var current_line_index: int = 0
 
 func _ready() -> void:
-	# 確保初始狀態是隱藏且透明的
 	bubble.hide()
 	bubble.modulate.a = 0.0
-	
-	# 綁定立繪的點擊信號
 	pressed.connect(_on_character_pressed)
 
 func _on_character_pressed() -> void:
-	if is_bubble_open:
-		_hide_bubble()
+	if not is_bubble_open:
+		_start_next_dialogue_group()
 	else:
-		_show_bubble()
+		_advance_or_close()
+
+func _start_next_dialogue_group() -> void:
+	if dialogue_groups.is_empty():
+		return
+
+	# 挑選一組對話（這裡示範隨機挑選；若有引導需求，也可以用佇列依序播放）
+	current_group = dialogue_groups.pick_random()
+	current_line_index = 0
+	
+	_show_current_line()
+	_show_bubble()
+
+func _advance_or_close() -> void:
+	current_line_index += 1
+	
+	# 如果群組中還有下一句，推進文字
+	if current_group and current_line_index < current_group.dialogue_keys.size():
+		_show_current_line()
+	else:
+		# 群組對話已播完，關閉氣泡
+		_finish_current_group()
+		_hide_bubble()
+
+func _show_current_line() -> void:
+	var key: String = current_group.dialogue_keys[current_line_index]
+	# tr() 會依據目前系統語言自動獲取對應譯文
+	label.text = tr(key)
+
+func _finish_current_group() -> void:
+	if current_group and current_group.play_once:
+		# 播完即移除，之後不會再被挑中
+		dialogue_groups.erase(current_group)
+	current_group = null
+	current_line_index = 0
 
 func _show_bubble() -> void:
 	if is_bubble_open: return
 	is_bubble_open = true
 	
-	# 隨機挑選一句話顯示 (如果你只想固定一句，可以把這行改掉)
-	label.text = texts.pick_random()
-	
-	# 顯示節點，並加入淡入動畫
+	if active_tween and active_tween.is_valid():
+		active_tween.kill()
+		
 	bubble.show()
-	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(bubble, "modulate:a", 1.0, 0.2)
+	active_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	active_tween.tween_property(bubble, "modulate:a", 1.0, 0.2)
 
 func _hide_bubble() -> void:
 	if not is_bubble_open: return
 	is_bubble_open = false
 	
-	# 淡出動畫，結束後隱藏節點
-	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.tween_property(bubble, "modulate:a", 0.0, 0.15)
-	tween.tween_callback(bubble.hide)
+	if active_tween and active_tween.is_valid():
+		active_tween.kill()
+		
+	active_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	active_tween.tween_property(bubble, "modulate:a", 0.0, 0.15)
+	active_tween.tween_callback(bubble.hide)

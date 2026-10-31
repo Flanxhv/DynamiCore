@@ -81,9 +81,6 @@ func _on_list_downloaded(result, response_code, headers, body):
 	else:
 		Toast.show_toast("Request failed. Error code: "+response_code)
 
-# ==========================================
-# ★ 縱二橫向卷軸生成器
-# ==========================================
 func _generate_card_grid(songs: Array):
 	var current_vbox: VBoxContainer = null
 	

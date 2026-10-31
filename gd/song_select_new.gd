@@ -133,7 +133,6 @@ func _ready():
 	effect_slider.value = Global.effect_height_ratio
 	if effect_style_toggle:
 		effect_style_toggle.button_pressed = Global.hit_effect_style
-		# 連接 Toggled 信號
 		effect_style_toggle.toggled.connect(_on_effect_style_toggled)
 	_update_setting_labels()
 	
@@ -166,14 +165,11 @@ func _ready():
 	# 2. 綁定 SETTINGS 按鈕與面板開關
 	if open_settings_btn:
 		open_settings_btn.pressed.connect(func(): 
-			# 如果當下篩選選單還開著，先強制關閉它，避免干擾
 			if is_filter_open:
 				_toggle_filter_panel()
 				
 			settings_panel.visible = true
 			settings_blocker.visible = true
-			
-			# ★ 確保開啟設定時，滑鼠點擊被遮罩完全攔截
 			settings_blocker.mouse_filter = Control.MOUSE_FILTER_STOP
 			settings_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 		)
@@ -697,11 +693,8 @@ func _refresh_difficulty_display():
 			record = Global.get_song_score_data(song_id, diff_type)
 			
 		score_triangle.update_score_data(record)
-# ==========================================
-# ★ 8. 其他底層功能 (原封不動貼回來)
-# ==========================================
+
 func _scan_local_songs():
-	# ... (維持原樣) ...
 	local_songs.clear()
 	var songs_dir = "user://songs/"
 	

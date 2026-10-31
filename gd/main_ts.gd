@@ -47,21 +47,21 @@ var current_warning_idx: int = 0
 @onready var ap_label = $HUD/AP_Overlay/AP_Center/AP_Label
 
 var is_game_ended: bool = false
-# ★ 新增：用來記錄整局的判定數量
 var judge_stats = {"PERFECT": 0, "GOOD": 0, "MISS": 0}
+var timing_stats = {"EARLY": 0, "LATE": 0}
 var tween_combo: Tween
 var tween_judge: Tween
-# 就像 Java 的 Class，我們建一個內部結構來裝單個音符的資料
+
 class NoteData:
 	var id: int
 	var type: String     # NORMAL, CHAIN, HOLD
 	var time: float
-	var real_time: float # 頭部秒數
+	var real_time: float
 	var position: float
 	var width: float
 	var sub_id: int
 	var side: String
-	var tail_real_time: float = 0.0 # 專門給 HOLD 用的尾部秒數
+	var tail_real_time: float = 0.0
 
 # 存放所有音符的陣列
 var all_notes: Array[NoteData] = []
@@ -71,8 +71,8 @@ var right_region: String = "PAD"
 # 用來存放接水果盤的實體節點
 var left_paddle: Panel  
 var right_paddle: Panel 
-
-# 全域譜面參數
+var auto_mixer_target_x: Dictionary = {"left": -999.0, "right": -999.0}
+var auto_mixer_locked_id: Dictionary = {"left": 0, "right": 0} # 記錄鎖定的音符 instance_id
 var bar_per_min: float = 0.0
 var time_offset: float = 0.0
 
@@ -81,8 +81,6 @@ func _ready():
 	speed = 1200.0 + 300.0 * Global.note_speed_mult
 	var required_lead_time = 1200.0 / speed
 	
-	# 我們取 2.0 秒或是 required_lead_time 兩者之間比較大的那個
-	# 這樣就算玩家速度調超快 (只需 0.5 秒就掉下來)，系統依然會提早 2 秒生成，保留緩衝效能
 	spawn_lead_time = max(2.0, required_lead_time)
 	if Global.current_song_data.is_empty():
 		Toast.show_toast("The data of the song is broken.")
@@ -92,30 +90,26 @@ func _ready():
 	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
 	Global.current_song_data["song_offset"] = Global.get_song_offset(song_id)
 
-	# ★ 新增：綁定暫停選單中的校準按鈕事件，並更新文字
 	if offset_minus_btn and offset_plus_btn:
 		offset_minus_btn.pressed.connect(_on_offset_minus_pressed)
 		offset_plus_btn.pressed.connect(_on_offset_plus_pressed)
 		_update_offset_label()
-	# ★ 處理背景圖與亮度
-	# 留下接口：只要改變 bg_brightness (0.0 暗 ~ 1.0 亮)，就能控制背景明暗
+
 	background.modulate = Color(Global.bg_brightness, Global.bg_brightness, Global.bg_brightness, 1.0)
 	if Global.current_song_data.has("cover_path"):
 		background.texture = load_external_image(Global.current_song_data["cover_path"])
 		background.size = get_viewport_rect().size
-		background.position = Vector2(0, 0) # 確保圖片對齊螢幕左上角
+		background.position = Vector2(0, 0)
 	var chart_path = Global.current_chart_path
 	var audio_path = Global.current_song_data["audio_path"]
 	song_label.text = Global.current_song_data["title"]
-	
-	# 2. 動態載入音樂檔案並放進 AudioStreamPlayer
+
 	var audio_stream = load_external_audio(audio_path)
 	if audio_stream:
 		audio_player.stream = audio_stream
 	else:
 		Toast.show_toast("Cannot found the music file："+audio_path)
 		
-	# 3. 解析對應的 XML 譜面
 	parse_dynamix_xml(chart_path)
 	if left_region == "MIXER":
 		left_paddle = Panel.new()
@@ -128,10 +122,9 @@ func _ready():
 		style.set_border_width_all(5)
 		left_paddle.add_theme_stylebox_override("panel", style)
 		
-		# ★ 座標取決於它加在哪個軌道上
 		if Global.mirror_mode:
 			track_right.add_child(left_paddle)
-			left_paddle.position = Vector2(-159, -22.5) # 右軌道的專屬位置
+			left_paddle.position = Vector2(-159, -22.5)
 		else:
 			track_left.add_child(left_paddle)
 			left_paddle.position = Vector2(-36, -22.5)  # 左軌道的專屬位置
@@ -371,7 +364,8 @@ func _process(delta):
 			break
 	# ★ 每一幀都要掃描 CHAIN 和 HOLD 的狀態
 	check_chain_notes()
-	
+	if Global.auto_play:
+		_update_auto_mixer_movement(delta)
 	# ==========================================
 	# ★ AUTO 模式：由電腦攔截所有點擊時間 (不處理滑塊移動)
 	# ==========================================
@@ -502,9 +496,6 @@ func spawn_note(n, current_time):
 		track_right.add_child(new_note)
 
 func _unhandled_input(event):
-	# ==========================================
-	# ★ AUTO 模式：絕對禁止人類干預！
-	# ==========================================
 	if Global.auto_play:
 		return
 
@@ -643,9 +634,7 @@ func try_hit_note(touch_pos: Vector2):
 						_show_feedback("PERFECT")
 					else:
 						_show_feedback("GOOD")
-				# 註：如果玩家提早點擊 (>0.059)，此處不做任何事。
-				# 它完美「吸收」了這次提早點擊，不會產生 EARLY MISS，符合原遊戲邏輯。
-				
+						timing_stats["LATE"] += 1
 			else:
 				# NORMAL / HOLD 判定
 				spawn_hit_effect(note, hit_color)
@@ -657,12 +646,17 @@ func try_hit_note(touch_pos: Vector2):
 		if ms_diff > 152 and ms_diff <= 234:
 			current_combo = 0
 			_show_feedback("MISS")
+			timing_stats["EARLY"] += normal_hit_count
 		elif abs(ms_diff) <= 59:
 			current_combo += normal_hit_count
 			_show_feedback("PERFECT")
 		elif abs(ms_diff) <= 152:
 			current_combo += normal_hit_count
 			_show_feedback("GOOD")
+			if ms_diff > 0:
+				timing_stats["EARLY"] += normal_hit_count
+			else:
+				timing_stats["LATE"] += normal_hit_count
 
 
 func check_chain_notes():
@@ -674,8 +668,7 @@ func check_chain_notes():
 			continue
 			
 		var t_diff = note.current_time_diff
-		
-		# 只要進入 Early 區間到漏接邊緣，都可以被觸發
+
 		if t_diff <= 0.059 and t_diff > -0.158:
 			var track = note.get_parent()
 			var is_caught = false
@@ -684,23 +677,9 @@ func check_chain_notes():
 			# ★ AUTO 模式攔截：自動在 PERFECT 時間接住 CHAIN
 			# ==========================================
 			if Global.auto_play:
-				if t_diff <= 0.07:
+				if t_diff <= 0.03:
 					is_caught = true
 					
-				var is_mixer = false
-				var current_paddle: Panel = null
-				
-				if track.name == "LeftTrack" and left_region == "MIXER":
-					is_mixer = true
-					current_paddle = left_paddle
-				elif track.name == "RightTrack" and right_region == "MIXER":
-					is_mixer = true
-					current_paddle = right_paddle
-					
-				if is_mixer and current_paddle != null:
-					# 讓盤子的中心對齊 CHAIN 音符的 X 座標
-					# 注意：盤子的 position.x 是左上角，所以要減去半寬 (97.5) 來置中
-					current_paddle.position.x = note.position.x - 97.5
 			else:
 				# 1. 判斷這顆音符所在的軌道，是不是 MIXER 模式？
 				var is_mixer = false
@@ -766,7 +745,88 @@ func check_chain_notes():
 					_show_feedback("PERFECT")
 				else:
 					_show_feedback("GOOD")
+					timing_stats["LATE"] += 1
 
+func _update_auto_mixer_movement(delta: float):
+	if left_region == "MIXER":
+		var target_track = track_right if Global.mirror_mode else track_left
+		var paddle = right_paddle if Global.mirror_mode else left_paddle
+		_process_single_mixer_auto(delta, target_track, paddle, "left", -422.5, 327.5)
+		
+	if right_region == "MIXER":
+		var target_track = track_left if Global.mirror_mode else track_right
+		var paddle = left_paddle if Global.mirror_mode else right_paddle
+		_process_single_mixer_auto(delta, target_track, paddle, "right", -522.5, 227.5)
+
+func _process_single_mixer_auto(delta: float, track: Node2D, paddle: Panel, side_key: String, min_x: float, max_x: float):
+	if paddle == null or track == null:
+		return
+		
+	var active_notes = get_tree().get_nodes_in_group("notes")
+	var candidates: Array = []
+	var min_time_diff: float = 999.0
+	
+	# 1. 搜尋該軌道上所有「未判定且即將到達」的 CHAIN
+	# 範圍：從剛過線 (-0.05s) 到未來 0.35s 內
+	for note in active_notes:
+		if note.get_parent() != track:
+			continue
+		if note.is_head_hit or note.type != "CHAIN":
+			continue
+			
+		var t_diff = note.current_time_diff
+		# 保留少許負值 (-0.05)，防止音符一碰線滑塊就立刻放棄追蹤
+		if t_diff <= 0.35 and t_diff > -0.05:
+			if candidates.is_empty():
+				candidates.append(note)
+				min_time_diff = t_diff
+			else:
+				# 時間差在 5ms 內視為同拍，加入隨機選擇候選池
+				if abs(t_diff - min_time_diff) <= 0.005:
+					candidates.append(note)
+				# 發現更早抵達的音符，重置候選名單
+				elif t_diff < min_time_diff:
+					candidates.clear()
+					candidates.append(note)
+					min_time_diff = t_diff
+					
+	# 2. 目標選定與切換
+	if not candidates.is_empty():
+		var current_locked_id = auto_mixer_locked_id[side_key]
+		var is_locked_still_valid = false
+		
+		# 檢查當前鎖定的音符是否依然存在於最優先的候選池內
+		for n in candidates:
+			if is_instance_valid(n) and n.get_instance_id() == current_locked_id:
+				is_locked_still_valid = true
+				break
+				
+		# 如果之前鎖定的音符已經被打掉/過期，或者換了新的一批音符，則重新隨機挑選
+		if not is_locked_still_valid:
+			var chosen_note = candidates.pick_random()
+			auto_mixer_locked_id[side_key] = chosen_note.get_instance_id()
+			auto_mixer_target_x[side_key] = chosen_note.position.x - 97.5
+	else:
+		auto_mixer_locked_id[side_key] = 0
+
+	# 3. 自適應平滑位移
+	if auto_mixer_target_x[side_key] != -999.0:
+		var target_clamped = clamp(auto_mixer_target_x[side_key], min_x, max_x)
+		var current_x = paddle.position.x
+		var dist_to_target = abs(target_clamped - current_x)
+		
+		# 剩餘時間越短，強制提高追蹤靈敏度
+		# 平常約 25.0，在密集的連續 SLIDE (時間 < 0.15s) 階段動態提升到 40.0~60.0
+		var remaining_time = max(min_time_diff, 0.01)
+		var speed_weight = clamp(1.0 / remaining_time, 25.0, 60.0)
+		
+		# 透過 lerpf 提供絲滑移動過程
+		paddle.position.x = lerpf(current_x, target_clamped, speed_weight * delta)
+		
+		# 保底機制：如果時間只剩不到 0.08 秒且距離還沒進入接球範圍，使用 move_toward 強制切入
+		if min_time_diff <= 0.08 and dist_to_target > 50.0:
+			var rush_speed = (dist_to_target / remaining_time) * 1.5
+			paddle.position.x = move_toward(paddle.position.x, target_clamped, rush_speed * delta)
 func check_hold_notes():
 	var active_notes = get_tree().get_nodes_in_group("notes")
 	
@@ -979,10 +1039,6 @@ func reset_combo_from_miss():
 	current_combo = 0
 	_show_feedback("MISS")
 
-# ==========================================
-# ★ 暫停系統
-# ==========================================
-
 func _on_pause_button_pressed():
 	if get_tree().paused:
 		get_tree().paused = false
@@ -1030,9 +1086,6 @@ func _play_ap_animation():
 	tween.chain().tween_property(ap_label, "modulate:a", 1.0, 0.1)
 	tween.parallel().tween_property(ap_label, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	
-	# ★ 核心加入：在字體縮放「砸」到畫面上的同一瞬間，用 tween_callback 觸發粒子爆發！
-	
-	
 	# [階段 4] 短暫延遲停留
 	tween.tween_interval(2.0)
 	
@@ -1054,8 +1107,6 @@ func _show_result_screen():
 	if is_game_ended:
 		return
 	is_game_ended = true
-	
-	print(">> 觸發結算畫面 (僅限一次) <<")
 	get_tree().paused = true
 	pause_button.visible = false
 	track_bottom.visible = false
@@ -1066,11 +1117,11 @@ func _show_result_screen():
 	stats_label.visible = false
 	downrect.visible = false
 	song_label.visible = false
-	if progress_bar:          # ★ 補上這行，將進度條隱藏
+	if progress_bar:
 		progress_bar.visible = false
 
 	# 呼叫獨立場景展示結果
-	result_screen.setup_and_show(judge_stats, max_combo)
+	result_screen.setup_and_show(judge_stats, max_combo, timing_stats)
 	
 func load_external_audio(path: String) -> AudioStream:
 	if path.begins_with("res://"):
@@ -1111,15 +1162,14 @@ func load_external_image(path: String) -> Texture2D:
 	return null
 
 func _get_diff_color(diff_raw: String) -> Color:
-	var upper_diff = diff_raw.to_upper() # 防呆：強制轉大寫比對
+	var upper_diff = diff_raw.to_upper()
 	if "NORMAL" in upper_diff: return Color(0, 0.55, 0.65)
 	elif "HARD" in upper_diff: return Color(0.95, 0.2, 0.25) 
 	elif "MEGA" in upper_diff: return Color(0.6, 0.2, 0.8)
 	elif "GIGA" in upper_diff: return Color(0.4, 0.4, 0.4)
 	elif "CASUAL" in upper_diff: return Color(0, 0.8, 0.5)
 	elif "TERA" in upper_diff: return Color(0, 0, 0)
-	
-	# 如果都沒配對到，給一個預設的灰色
+
 	return Color(0.5, 0.5, 0.5)
 
 # ==========================================
@@ -1158,7 +1208,6 @@ func _update_offset_label():
 		offset_label.text = "Offset\n%+.2fs" % current_offset
 
 func _notification(what):
-	# 當接收到「APP 進入背景 (手機端)」或「視窗失去焦點 (電腦端)」的系統通知時
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
 		_force_pause()
 

@@ -20,6 +20,34 @@ border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
 
+[sub_resource type="Gradient" id="Gradient_513gx"]
+offsets = PackedFloat32Array(0, 0.53317535)
+colors = PackedColorArray(1, 1, 1, 0.72400004, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_bqahm"]
+gradient = SubResource("Gradient_513gx")
+
+[sub_resource type="Gradient" id="Gradient_iwo3y"]
+offsets = PackedFloat32Array(0, 0.52369666)
+colors = PackedColorArray(0.086104214, 0.95468724, 0, 0.72400004, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lxhaq"]
+gradient = SubResource("Gradient_iwo3y")
+
+[sub_resource type="Gradient" id="Gradient_hmrl6"]
+offsets = PackedFloat32Array(0, 0.5168269)
+colors = PackedColorArray(1, 0, 0, 0.72400004, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_bc5ao"]
+gradient = SubResource("Gradient_hmrl6")
+
+[sub_resource type="Gradient" id="Gradient_nn8wi"]
+offsets = PackedFloat32Array(0, 0.5168269)
+colors = PackedColorArray(1, 1, 0, 0.72400004, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_hfbdk"]
+gradient = SubResource("Gradient_nn8wi")
+
 [node name="ResultScreen" type="CanvasLayer" unique_id=1076579021]
 layer = 128
 script = ExtResource("1_513gx")
@@ -50,7 +78,7 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 0.16203703
 offset_bottom = 1.5258789e-05
-color = Color(0.1897483, 0.1897483, 0.1897483, 0.89000005)
+color = Color(0.083911665, 0.083911665, 0.083911665, 0.8901961)
 metadata/_edit_use_anchors_ = true
 
 [node name="SongNameRect2" type="ColorRect" parent="RootControl/ResultMenu" unique_id=1772258437]
@@ -70,10 +98,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.058333334
 anchor_top = 0.18425927
-anchor_right = 0.665625
-anchor_bottom = 0.38518518
+anchor_right = 0.5609375
+anchor_bottom = 0.46944445
 theme_override_fonts/normal_font = ExtResource("3_iwo3y")
-theme_override_font_sizes/normal_font_size = 80
+theme_override_font_sizes/normal_font_size = 100
 bbcode_enabled = true
 metadata/_edit_use_anchors_ = true
 
@@ -82,12 +110,15 @@ unique_name_in_owner = true
 process_mode = 3
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.05625
-anchor_top = 0.4185185
-anchor_right = 0.6796875
-anchor_bottom = 0.9074074
+anchor_left = 0.28958333
+anchor_top = 0.42037037
+anchor_right = 0.58177084
+anchor_bottom = 1.0018518
+offset_top = 2.0
+offset_bottom = 9.0
 theme_override_fonts/font = ExtResource("3_iwo3y")
-theme_override_font_sizes/font_size = 65
+theme_override_font_sizes/font_size = 50
+vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="SongNameLabel" type="Label" parent="RootControl/ResultMenu" unique_id=2005497280]
@@ -99,7 +130,7 @@ anchor_top = 0.024074074
 anchor_right = 0.94375
 anchor_bottom = 0.14351852
 theme_override_fonts/font = ExtResource("4_lxhaq")
-theme_override_font_sizes/font_size = 90
+theme_override_font_sizes/font_size = 80
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
@@ -140,4 +171,79 @@ theme_override_fonts/font = ExtResource("4_lxhaq")
 theme_override_font_sizes/font_size = 50
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_bc5ao")
 text = "Quit"
+metadata/_edit_use_anchors_ = true
+
+[node name="PerfectRect" type="TextureRect" parent="RootControl/ResultMenu" unique_id=2136760483]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.052604165
+anchor_top = 0.48240742
+anchor_right = 0.49479166
+anchor_bottom = 0.5453704
+texture = SubResource("GradientTexture1D_bqahm")
+metadata/_edit_use_anchors_ = true
+
+[node name="GoodRect" type="TextureRect" parent="RootControl/ResultMenu" unique_id=1117634045]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.052604165
+anchor_top = 0.5833333
+anchor_right = 0.49479166
+anchor_bottom = 0.64629626
+texture = SubResource("GradientTexture1D_lxhaq")
+metadata/_edit_use_anchors_ = true
+
+[node name="MissRect" type="TextureRect" parent="RootControl/ResultMenu" unique_id=278565207]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.052604165
+anchor_top = 0.68333334
+anchor_right = 0.49498922
+anchor_bottom = 0.7462963
+texture = SubResource("GradientTexture1D_bc5ao")
+metadata/_edit_use_anchors_ = true
+
+[node name="ComboRect" type="TextureRect" parent="RootControl/ResultMenu" unique_id=1613922263]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.052604165
+anchor_top = 0.78055555
+anchor_right = 0.49479166
+anchor_bottom = 0.84351856
+texture = SubResource("GradientTexture1D_hfbdk")
+metadata/_edit_use_anchors_ = true
+
+[node name="Line" type="ColorRect" parent="RootControl/ResultMenu" unique_id=254625255]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.26927084
+anchor_top = 0.49444443
+anchor_right = 0.26927084
+anchor_bottom = 0.8833334
+offset_right = 3.0
+metadata/_edit_use_anchors_ = true
+
+[node name="JudgeTextLabel" type="Label" parent="RootControl/ResultMenu" unique_id=857953064]
+unique_name_in_owner = true
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.0390625
+anchor_top = 0.42222223
+anchor_right = 0.253125
+anchor_bottom = 1.0101852
+theme_override_fonts/font = ExtResource("3_iwo3y")
+theme_override_font_sizes/font_size = 50
+text = "PERFECT
+
+GOOD
+
+MISS
+
+MAX COMBO
+
+E/L"
+horizontal_alignment = 2
+vertical_alignment = 1
 metadata/_edit_use_anchors_ = true

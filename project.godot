@@ -39,6 +39,10 @@ movie_writer/movie_file="C:/Users/s0120/Downloads/DynamiCore/test.avi"
 
 pointing/emulate_touch_from_mouse=true
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://localization/dialogue_strings.zh.translation", "res://localization/dialogue_strings.zh_TW.translation")
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
