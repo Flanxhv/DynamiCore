@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://krp1o5i6vv2w"]
+
+[ext_resource type="Script" uid="uid://cttcgcwkn2bno" path="res://gd/score_triangle.gd" id="1_fahav"]
+[ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="1_ymx7a"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_fahav"]
+font = ExtResource("1_ymx7a")
+font_size = 40
+font_color = Color(0, 0, 0, 1)
+outline_size = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_a23ll"]
+font = ExtResource("1_ymx7a")
+font_size = 40
+font_color = Color(0, 0, 0, 1)
+outline_size = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_yoos4"]
+font = ExtResource("1_ymx7a")
+font_size = 40
+font_color = Color(0, 0, 0, 1)
+outline_size = 7
+
+[node name="ScoreTriangle" type="Button" unique_id=2020782159]
+offset_right = 370.0
+offset_bottom = 370.0
+flat = true
+script = ExtResource("1_fahav")
+
+[node name="BgPoly" type="Polygon2D" parent="." unique_id=1203821700]
+color = Color(0.1680183, 0.36556464, 0.87455684, 0.69000006)
+polygon = PackedVector2Array(0, 370, 370, 370, 185, 185)
+
+[node name="BorderLine" type="Line2D" parent="." unique_id=1041455861]
+
+[node name="PercentageLabel" type="Label" parent="." unique_id=38585121]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -49.0
+offset_top = -60.0
+offset_right = 49.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "ACC"
+label_settings = SubResource("LabelSettings_fahav")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RankLabel" type="Label" parent="." unique_id=758534642]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.375
+anchor_top = 0.6535715
+anchor_right = 0.625
+anchor_bottom = 0.79732144
+text = "S"
+label_settings = SubResource("LabelSettings_a23ll")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="JudgementsLabel" type="Label" parent="." unique_id=1190559811]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -69.5
+offset_top = -60.0
+offset_right = 69.5
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "P/G/M"
+label_settings = SubResource("LabelSettings_yoos4")
+horizontal_alignment = 1
+vertical_alignment = 1

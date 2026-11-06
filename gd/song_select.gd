@@ -29,6 +29,8 @@ extends Control
 @onready var scroll_container = $ScrollContainer
 @onready var scroll_bg = $ScrollBg
 
+const SongListItemScene = preload("res://tscn/SongListItem.tscn")
+
 var scroll_fade_tween: Tween
 var local_songs: Array = []
 var current_selected_song: Dictionary = {}

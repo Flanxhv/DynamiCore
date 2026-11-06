@@ -1,0 +1,135 @@
+[gd_scene format=3 uid="uid://br2qn74cgcrcg"]
+
+[ext_resource type="Script" uid="uid://t5vmrlxsdq1g" path="res://gd/result_screen.gd" id="1_513gx"]
+[ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_bqahm"]
+[ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="3_iwo3y"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="4_lxhaq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hmrl6"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bc5ao"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+
+[node name="ResultScreen" type="Control" unique_id=298407777]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_513gx")
+
+[node name="ResultMenu" type="ColorRect" parent="." unique_id=536156973]
+process_mode = 3
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.4072413, 0.4072413, 0.4072413, 0.6)
+
+[node name="BgParticles" parent="ResultMenu" unique_id=349948908 instance=ExtResource("2_bqahm")]
+
+[node name="SongNameRect1" type="ColorRect" parent="ResultMenu" unique_id=986551865]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 0.16203703
+offset_bottom = 1.5258789e-05
+color = Color(0.1897483, 0.1897483, 0.1897483, 0.89000005)
+metadata/_edit_use_anchors_ = true
+
+[node name="SongNameRect2" type="ColorRect" parent="ResultMenu" unique_id=1772258437]
+layout_mode = 0
+anchor_top = 0.14351852
+anchor_right = 1.0
+anchor_bottom = 0.16203703
+offset_bottom = 1.5258789e-05
+color = Color(0.48000664, 1, 1, 0.70000005)
+metadata/_edit_use_anchors_ = true
+
+[node name="ScoreLabel" type="RichTextLabel" parent="ResultMenu" unique_id=2016027890]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.058333334
+anchor_top = 0.18425927
+anchor_right = 0.665625
+anchor_bottom = 0.38518518
+theme_override_fonts/normal_font = ExtResource("3_iwo3y")
+theme_override_font_sizes/normal_font_size = 80
+bbcode_enabled = true
+metadata/_edit_use_anchors_ = true
+
+[node name="DetailsLabel" type="Label" parent="ResultMenu" unique_id=746309322]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05625
+anchor_top = 0.4185185
+anchor_right = 0.6796875
+anchor_bottom = 0.9074074
+theme_override_fonts/font = ExtResource("3_iwo3y")
+theme_override_font_sizes/font_size = 65
+metadata/_edit_use_anchors_ = true
+
+[node name="SongNameLabel" type="Label" parent="ResultMenu" unique_id=2005497280]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05625
+anchor_top = 0.024074074
+anchor_right = 0.94375
+anchor_bottom = 0.14351852
+theme_override_fonts/font = ExtResource("4_lxhaq")
+theme_override_font_sizes/font_size = 90
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="RestartButton" type="Button" parent="ResultMenu" unique_id=385581264]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.82239586
+anchor_top = 0.7574074
+anchor_right = 0.971875
+anchor_bottom = 0.8407408
+offset_left = -2.0
+offset_right = 11.0
+offset_bottom = -6.1035156e-05
+focus_mode = 0
+theme_override_fonts/font = ExtResource("4_lxhaq")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_hmrl6")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxFlat_hmrl6")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_hmrl6")
+text = "Restart"
+metadata/_edit_use_anchors_ = true
+
+[node name="QuitButton" type="Button" parent="ResultMenu" unique_id=1060647764]
+process_mode = 3
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.82916665
+anchor_top = 0.8787037
+anchor_right = 0.978125
+anchor_bottom = 0.962037
+offset_left = -15.0
+offset_right = -1.0
+offset_bottom = -6.1035156e-05
+theme_override_fonts/font = ExtResource("4_lxhaq")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_bc5ao")
+text = "Quit"
+metadata/_edit_use_anchors_ = true

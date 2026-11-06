@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cjbg0rl2pnsl1"]
+
+[ext_resource type="Script" uid="uid://5yj7hjfri47c" path="res://gd/Note.gd" id="1_m01oh"]
+[ext_resource type="Texture2D" uid="uid://bggi4ndhlajta" path="res://pic/note_base.png" id="2_khuok"]
+
+[node name="Note" type="Area2D" unique_id=1676667370]
+script = ExtResource("1_m01oh")
+
+[node name="Visual" type="NinePatchRect" parent="." unique_id=1561853948]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_khuok")
+patch_margin_left = 5
+patch_margin_right = 5

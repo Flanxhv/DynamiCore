@@ -1,56 +1,68 @@
 extends Button
 
-@export var base_style: StyleBoxFlat 
-@export var glow_color: Color = Color("4de6ff9d") 
-@export var glow_size: int = 24 # 建議把點擊時的光暈調大一點，比如 24，才能跟待機的 12px 產生對比
+@export_group("Touch Feedback")
+@export var pressed_offset_y: float = 4.0      # 按下時下沉距離
+@export var pressed_scale: Vector2 = Vector2(0.98, 0.98) # 輕微等比壓低
+@export var pressed_bg_color: Color = Color(0.08, 0.09, 0.11, 0.9) # 按下變深
 
 var style_box: StyleBoxFlat
-var original_shadow_color: Color
-var original_offset: Vector2
-var original_shadow_size: int # 新增：用來記錄你設定的 12px
+var _original_bg_color: Color
+var _original_shadow_offset: Vector2
+var _original_shadow_size: int
+var _tween: Tween
 
 func _ready() -> void:
-	if base_style == null:
-		if has_theme_stylebox_override("normal"):
-			var override_style = get_theme_stylebox("normal")
-			if override_style is StyleBoxFlat:
-				base_style = override_style as StyleBoxFlat
-				
-	if base_style == null:
-		push_error("【錯誤】找不到 StyleBoxFlat！請將材質拖入右側腳本屬性的 Base Style 中。")
-		return
+	# 抓取 Inspector 裡設定好的 StyleBox 並獨立化 (避免共用污染)
+	var current_style = get_theme_stylebox("normal")
+	if current_style is StyleBoxFlat:
+		style_box = current_style.duplicate() as StyleBoxFlat
+		add_theme_stylebox_override("normal", style_box)
+		add_theme_stylebox_override("pressed", style_box)
+		add_theme_stylebox_override("hover", style_box)
+		add_theme_stylebox_override("focus", style_box)
+		
+		# 自動讀取 Inspector 調好的參數做為待機還原值
+		_original_bg_color = style_box.bg_color
+		_original_shadow_offset = style_box.shadow_offset
+		_original_shadow_size = style_box.shadow_size
 
-	style_box = base_style.duplicate() as StyleBoxFlat
-	
-	# 完整讀取你在編輯器裡設定的所有參數
-	original_shadow_color = style_box.shadow_color
-	original_offset = style_box.shadow_offset
-	original_shadow_size = style_box.shadow_size # 成功抓到你的 12px
-	
-	add_theme_stylebox_override("normal", style_box)
-	add_theme_stylebox_override("hover", style_box)
-	add_theme_stylebox_override("pressed", style_box)
-	add_theme_stylebox_override("focus", style_box)
+	# 設定縮放中心
+	pivot_offset = size / 2.0
+	resized.connect(func(): pivot_offset = size / 2.0)
 	
 	button_down.connect(_on_button_down)
 	button_up.connect(_on_button_up)
 
 
 func _on_button_down() -> void:
-	if style_box == null: return
-	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.set_parallel(true)
-	# 按下：陰影回到正中央 (0,0)，尺寸放大變成光暈，顏色變亮
-	tween.tween_property(style_box, "shadow_offset", Vector2.ZERO, 0.1)
-	tween.tween_property(style_box, "shadow_size", glow_size, 0.1)
-	tween.tween_property(style_box, "shadow_color", glow_color, 0.1)
+	if _tween and _tween.is_valid():
+		_tween.kill()
+		
+	_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	
+	# 漂浮減弱：陰影收小、貼緊、顏色加深
+	if style_box:
+		_tween.tween_property(style_box, "shadow_offset", Vector2(2, 2), 0.08)
+		_tween.tween_property(style_box, "shadow_size", 2, 0.08)
+		_tween.tween_property(style_box, "bg_color", pressed_bg_color, 0.08)
+	
+	# 下沉與微縮
+	_tween.tween_property(self, "position:y", position.y + pressed_offset_y, 0.08)
+	_tween.tween_property(self, "scale", pressed_scale, 0.08)
 
 
 func _on_button_up() -> void:
-	if style_box == null: return
-	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.set_parallel(true)
-	# 放開：恢復成你在編輯器設定的位移 (12,10) 和尺寸 (12)
-	tween.tween_property(style_box, "shadow_offset", original_offset, 0.3)
-	tween.tween_property(style_box, "shadow_size", original_shadow_size, 0.3) 
-	tween.tween_property(style_box, "shadow_color", original_shadow_color, 0.3)
+	if _tween and _tween.is_valid():
+		_tween.kill()
+		
+	_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	
+	# 恢復 Inspector 原本設定的漂浮狀態
+	if style_box:
+		_tween.tween_property(style_box, "shadow_offset", _original_shadow_offset, 0.15)
+		_tween.tween_property(style_box, "shadow_size", _original_shadow_size, 0.15)
+		_tween.tween_property(style_box, "bg_color", _original_bg_color, 0.15)
+	
+	# 回彈
+	_tween.tween_property(self, "position:y", position.y - pressed_offset_y, 0.15)
+	_tween.tween_property(self, "scale", Vector2.ONE, 0.15)

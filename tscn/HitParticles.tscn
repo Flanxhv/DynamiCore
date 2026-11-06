@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://dvpmgd0nqcnqg"]
+
+[ext_resource type="Texture2D" uid="uid://cb7snrahjixey" path="res://pic/Particles.png" id="1_oh4ce"]
+[ext_resource type="Script" uid="uid://cw82kaspc6cxc" path="res://gd/hit_particles.gd" id="2_jwr3g"]
+
+[sub_resource type="Curve" id="Curve_vgry8"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_76klm"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="HitParticles" type="CPUParticles2D" unique_id=1949142916]
+emitting = false
+texture = ExtResource("1_oh4ce")
+lifetime = 0.45
+one_shot = true
+explosiveness = 0.97
+emission_shape = 3
+emission_rect_extents = Vector2(150, 150)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 300.0
+initial_velocity_max = 600.0
+damping_min = 200.0
+damping_max = 200.0
+angle_min = -90.0
+angle_max = 90.0
+scale_amount_curve = SubResource("Curve_vgry8")
+color_ramp = SubResource("Gradient_76klm")
+script = ExtResource("2_jwr3g")

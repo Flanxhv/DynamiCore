@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://dg25jahmrk0i2"]
+
+[ext_resource type="Script" uid="uid://c83dmgsbgwk5u" path="res://gd/difficulty_triangle.gd" id="1_0qb6w"]
+[ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="2_g25nw"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_k8y8n"]
+font = ExtResource("2_g25nw")
+font_size = 20
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_xob0d"]
+font = ExtResource("2_g25nw")
+font_size = 40
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[node name="DifficultyTriangle" type="Button" unique_id=1844563013]
+custom_minimum_size = Vector2(150, 150)
+offset_right = 150.0
+offset_bottom = 150.0
+flat = true
+script = ExtResource("1_0qb6w")
+
+[node name="BgPoly" type="Polygon2D" parent="." unique_id=1509990703]
+polygon = PackedVector2Array(0, 150, 150, 150, 150, 0)
+
+[node name="SwipePoly" type="Polygon2D" parent="." unique_id=1110261986]
+polygon = PackedVector2Array(0, 150, 150, 150, 150, 0)
+
+[node name="NameLabel" type="Label" parent="." unique_id=988683548]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 139.06601
+offset_right = 178.0
+offset_bottom = 179.06601
+rotation = -0.7853982
+text = "TEST"
+label_settings = SubResource("LabelSettings_k8y8n")
+horizontal_alignment = 1
+
+[node name="NumLabel" type="Label" parent="." unique_id=712098839]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 97.06603
+offset_right = 171.0
+offset_bottom = 182.06601
+text = "11"
+label_settings = SubResource("LabelSettings_xob0d")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

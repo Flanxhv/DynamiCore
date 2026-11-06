@@ -19,29 +19,26 @@ var current_warning_idx: int = 0
 @onready var offset_label = $HUD/PauseMenu/OffsetLabel
 @onready var offset_minus_btn = $HUD/PauseMenu/OffsetMinusButton
 @onready var offset_plus_btn = $HUD/PauseMenu/OffsetPlusButton
-@onready var result_diff_line = $HUD/ResultMenu/SongNameRect2
 @onready var ap_particles = $HUD/AP_Overlay/AP_Center/AP_Particles
 @onready var song_label = $HUD/SongLabel
 @onready var progress_bar = $HUD/SongProgressBar
 @onready var background = $Background
 @onready var downrect = $DownRect
-@onready var result_menu = $HUD/ResultMenu
-@onready var result_score_label = $HUD/ResultMenu/ScoreLabel
-@onready var result_details_label = $HUD/ResultMenu/DetailsLabel
-@onready var res_restart_btn = $HUD/ResultMenu/RestartButton
-@onready var res_quit_btn = $HUD/ResultMenu/QuitButton
+@onready var result_screen = $ResultScreen
 @onready var combo_label = $HUD/ComboLabel
 @onready var audio_player = $AudioStreamPlayer
+
 @onready var track_bottom = $BottomTrack
 @onready var track_left = $LeftTrack
 @onready var track_right = $RightTrack
 @onready var judgement_label = $HUD/JudgmentLabel
 @onready var stats_label = $HUD/StatsLabel
+
 @onready var pause_button = $HUD/PauseButton
 @onready var pause_menu = $HUD/PauseMenu
 @onready var restart_button = $HUD/PauseMenu/RestartButton
 @onready var quit_button = $HUD/PauseMenu/QuitButton
-@onready var result_song_label = $HUD/ResultMenu/SongNameLabel
+
 @onready var ap_overlay = $HUD/AP_Overlay
 @onready var ap_dim_bg = $HUD/AP_Overlay/DimBackground
 @onready var ap_center = $HUD/AP_Overlay/AP_Center
@@ -49,22 +46,47 @@ var current_warning_idx: int = 0
 @onready var ap_bottom_line = $HUD/AP_Overlay/AP_Center/BottomLine
 @onready var ap_label = $HUD/AP_Overlay/AP_Center/AP_Label
 
+const HIT_PARTICLES_SCENE = preload("res://tscn/HitParticles.tscn")
+const PARTICLE_POOL_SIZE: int = 16
+var particle_pools: Dictionary = {
+	"BottomTrack": [],
+	"LeftTrack": [],
+	"RightTrack": []
+}
+var particle_pool_indices: Dictionary = {
+	"BottomTrack": 0,
+	"LeftTrack": 0,
+	"RightTrack": 0
+}
 
-# ★ 新增：用來記錄整局的判定數量
+const HOLD_PARTICLES_SCENE = preload("res://tscn/HoldParticles.tscn")
+const HOLD_POOL_SIZE_PER_TRACK: int = 4 # 每軌同時間能發射長條粒子的上限（一般 4 根綽綽有餘）
+
+var hold_particle_pools: Dictionary = {
+	"BottomTrack": [],
+	"LeftTrack": [],
+	"RightTrack": []
+}
+
+# 追蹤音符與粒子的對應關係 { note_instance_id: particle_node }
+var active_hold_particles: Dictionary = {}
+
+var is_game_ended: bool = false
 var judge_stats = {"PERFECT": 0, "GOOD": 0, "MISS": 0}
+var timing_stats = {"EARLY": 0, "LATE": 0}
 var tween_combo: Tween
 var tween_judge: Tween
-# 就像 Java 的 Class，我們建一個內部結構來裝單個音符的資料
+
 class NoteData:
 	var id: int
 	var type: String     # NORMAL, CHAIN, HOLD
 	var time: float
-	var real_time: float # 頭部秒數
+	var real_time: float
 	var position: float
 	var width: float
 	var sub_id: int
 	var side: String
-	var tail_real_time: float = 0.0 # 專門給 HOLD 用的尾部秒數
+	var tail_real_time: float = 0.0
 
 # 存放所有音符的陣列
 var all_notes: Array[NoteData] = []
@@ -74,52 +96,44 @@ var right_region: String = "PAD"
 # 用來存放接水果盤的實體節點
 var left_paddle: Panel  
 var right_paddle: Panel 
-
-# 全域譜面參數
+var auto_mixer_target_x: Dictionary = {"left": -999.0, "right": -999.0}
+var auto_mixer_locked_id: Dictionary = {"left": 0, "right": 0} # 記錄鎖定的音符 instance_id
 var bar_per_min: float = 0.0
 var time_offset: float = 0.0
 
 func _ready():
 	# 1. 確保有拿到歌曲資料 (防呆機制)
-	speed = 1900.0 + 100.0 * Global.note_speed_mult
-	var required_lead_time = 1200.0 / speed
-	
-	# 我們取 2.0 秒或是 required_lead_time 兩者之間比較大的那個
-	# 這樣就算玩家速度調超快 (只需 0.5 秒就掉下來)，系統依然會提早 2 秒生成，保留緩衝效能
-	spawn_lead_time = max(2.0, required_lead_time)
+	speed = 1800.0 * Global.note_speed_mult
+	var max_track_dist = 940.0
+	spawn_lead_time = (max_track_dist / speed) + 0.5
 	if Global.current_song_data.is_empty():
-		print("沒有歌曲資料！退回主選單...")
-		get_tree().change_scene_to_file("uid://dnda82ibqdnuq")
+		Toast.show_toast("The data of the song is broken.")
+		get_tree().change_scene_to_file("uid://nfkrp5p1relk")
 		return
 	
 	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
 	Global.current_song_data["song_offset"] = Global.get_song_offset(song_id)
 
-	# ★ 新增：綁定暫停選單中的校準按鈕事件，並更新文字
 	if offset_minus_btn and offset_plus_btn:
 		offset_minus_btn.pressed.connect(_on_offset_minus_pressed)
 		offset_plus_btn.pressed.connect(_on_offset_plus_pressed)
 		_update_offset_label()
-	# ★ 處理背景圖與亮度
-	# 留下接口：只要改變 bg_brightness (0.0 暗 ~ 1.0 亮)，就能控制背景明暗
+
 	background.modulate = Color(Global.bg_brightness, Global.bg_brightness, Global.bg_brightness, 1.0)
 	if Global.current_song_data.has("cover_path"):
 		background.texture = load_external_image(Global.current_song_data["cover_path"])
 		background.size = get_viewport_rect().size
-		background.position = Vector2(0, 0) # 確保圖片對齊螢幕左上角
+		background.position = Vector2(0, 0)
 	var chart_path = Global.current_chart_path
 	var audio_path = Global.current_song_data["audio_path"]
 	song_label.text = Global.current_song_data["title"]
-	print("即將遊玩: ", Global.current_song_data["title"])
-	
-	# 2. 動態載入音樂檔案並放進 AudioStreamPlayer
+
 	var audio_stream = load_external_audio(audio_path)
 	if audio_stream:
 		audio_player.stream = audio_stream
 	else:
-		print("找不到音樂檔案！請檢查路徑：", audio_path)
+		Toast.show_toast("Cannot found the music file："+audio_path)
 		
-	# 3. 解析對應的 XML 譜面
 	parse_dynamix_xml(chart_path)
 	if left_region == "MIXER":
 		left_paddle = Panel.new()
@@ -132,10 +146,9 @@ func _ready():
 		style.set_border_width_all(5)
 		left_paddle.add_theme_stylebox_override("panel", style)
 		
-		# ★ 座標取決於它加在哪個軌道上
 		if Global.mirror_mode:
 			track_right.add_child(left_paddle)
-			left_paddle.position = Vector2(-159, -22.5) # 右軌道的專屬位置
+			left_paddle.position = Vector2(-159, -22.5)
 		else:
 			track_left.add_child(left_paddle)
 			left_paddle.position = Vector2(-36, -22.5)  # 左軌道的專屬位置
@@ -166,7 +179,7 @@ func _ready():
 	btn_style.set_corner_radius_all(8)             # 圓角 8px
 	
 	# 將這個樣式強制套用到「重新開始」和「退出」按鈕的所有狀態
-	var target_buttons = [restart_button, quit_button,res_quit_btn,res_restart_btn]
+	var target_buttons = [restart_button, quit_button]
 	
 	for btn in target_buttons:
 		if btn != null:
@@ -187,11 +200,132 @@ func _ready():
 	pause_button.pressed.connect(_on_pause_button_pressed)
 	restart_button.pressed.connect(_on_restart_button_pressed) #
 	quit_button.pressed.connect(_on_quit_button_pressed)
-	res_restart_btn.pressed.connect(_on_restart_button_pressed)
-	res_quit_btn.pressed.connect(_on_quit_button_pressed)
 	audio_player.finished.connect(_on_audio_finished)
 	_init_blur_material()
+	_init_particle_pools()
+	_init_hold_particle_pools()
+	_prewarm_shaders()
 
+func _prewarm_shaders():
+	var dummy = ColorRect.new()
+	dummy.material = blur_effect_material
+	dummy.modulate.a = 0.001
+	dummy.size = Vector2(1, 1)
+	add_child(dummy)
+	get_tree().process_frame.connect(func(): dummy.queue_free(), CONNECT_ONE_SHOT)
+
+func _init_particle_pools():
+	var tracks = {
+		"BottomTrack": track_bottom,
+		"LeftTrack": track_left,
+		"RightTrack": track_right
+	}
+	
+	for track_name in tracks.keys():
+		var target_track = tracks[track_name]
+		if target_track == null: continue
+		
+		for i in range(PARTICLE_POOL_SIZE):
+			var p = HIT_PARTICLES_SCENE.instantiate()
+			p.emitting = false
+			# 預設隱藏並設為一次性發射，避免初始畫面干擾
+			p.one_shot = true
+			target_track.add_child(p)
+			particle_pools[track_name].append(p)
+
+func _init_hold_particle_pools():
+	var tracks = {
+		"BottomTrack": track_bottom,
+		"LeftTrack": track_left,
+		"RightTrack": track_right
+	}
+	
+	for track_name in tracks.keys():
+		var target_track = tracks[track_name]
+		if target_track == null: continue
+		
+		for i in range(HOLD_POOL_SIZE_PER_TRACK):
+			var p = HOLD_PARTICLES_SCENE.instantiate()
+			p.emitting = false
+			p.one_shot = false # HOLD 是持續噴射，所以不是 one_shot
+			p.visible = false
+			target_track.add_child(p)
+			hold_particle_pools[track_name].append(p)
+
+# 開始 HOLD 特效（租借粒子節點）
+func start_hold_effect(note: Node2D):
+	var track = note.get_parent()
+	if track == null or not hold_particle_pools.has(track.name):
+		return
+		
+	var n_id = note.get_instance_id()
+	# 如果這個音符已經在發射中，不重複租借
+	if active_hold_particles.has(n_id):
+		return
+		
+	var pool: Array = hold_particle_pools[track.name]
+	var available_particle: CPUParticles2D = null
+	
+	# 尋找當前未被使用的粒子節點
+	for p in pool:
+		if not p.emitting and not p.visible:
+			available_particle = p
+			break
+			
+	if available_particle == null:
+		return # 池子已滿（防呆）
+		
+	# 設定粒子發射位置與範圍 (鎖定在判定線上)
+	available_particle.position = Vector2(note.position.x, 0.0)
+	available_particle.emission_rect_extents = Vector2(note.hit_width / 2.0, 4.0)
+	available_particle.amount = clampi(int(note.hit_width * 0.08), 16, 45)
+	
+	available_particle.visible = true
+	available_particle.restart()
+	available_particle.emitting = true
+	
+	# 登記佔用
+	active_hold_particles[n_id] = available_particle
+
+# 停止 HOLD 特效（歸還粒子節點）
+func stop_hold_effect(note: Node2D):
+	var n_id = note.get_instance_id()
+	if not active_hold_particles.has(n_id):
+		return
+		
+	var p: CPUParticles2D = active_hold_particles[n_id]
+	active_hold_particles.erase(n_id)
+	
+	# 停止發射
+	p.emitting = false
+	
+	# 等待當前已噴出在空中的粒子自然消失後隱藏備用
+	var timer = get_tree().create_timer(p.lifetime)
+	timer.timeout.connect(func():
+		if not p.emitting:
+			p.visible = false
+	)
+	
+func _play_pooled_particle(track_node: Node2D, note_x: float, width: float, color: Color):
+	var track_name = track_node.name
+	if not particle_pools.has(track_name):
+		return
+		
+	var pool: Array = particle_pools[track_name]
+	if pool.is_empty():
+		return
+		
+	# 取出當前游標指向的粒子節點
+	var idx = particle_pool_indices[track_name]
+	var p = pool[idx]
+	particle_pool_indices[track_name] = (idx + 1) % pool.size()
+	
+	# 更新位置與外觀，重新觸發發射
+	p.position = Vector2(note_x, 0.0)
+	p.setup(width, color)
+	p.restart()
+	p.emitting = true
+	
 func _on_audio_finished():
 	if is_ap_animating:
 		# 如果正在播 AP 動畫，這裡什麼都不做 (Return)
@@ -228,7 +362,7 @@ func _prepare_track_warnings():
 func parse_dynamix_xml(file_path: String):
 	var parser = XMLParser.new()
 	if parser.open(file_path) != OK:
-		print("無法開啟譜面檔案！")
+		Toast.show_toast("Illegal chart file.")
 		return
 
 	var current_side = "bottom"
@@ -377,7 +511,8 @@ func _process(delta):
 			break
 	# ★ 每一幀都要掃描 CHAIN 和 HOLD 的狀態
 	check_chain_notes()
-	
+	if Global.auto_play:
+		_update_auto_mixer_movement(delta)
 	# ==========================================
 	# ★ AUTO 模式：由電腦攔截所有點擊時間 (不處理滑塊移動)
 	# ==========================================
@@ -479,8 +614,7 @@ func spawn_note(n, current_time):
 	new_note.tail_time = n.tail_real_time 
 	
 	var time_diff = n.real_time - current_time
-	new_note.position.y = -(time_diff * 2000.0 * Global.note_speed_mult)
-	
+	new_note.position.y = -(time_diff * speed)
 	# 將 XML 的「左邊緣座標」轉換回「真正的中心點座標」
 	var actual_center_pos = n.position + (n.width / 2.0)
 	
@@ -489,55 +623,57 @@ func spawn_note(n, current_time):
 	if n.side == "bottom":
 		new_note.position.x = (actual_center_pos - track_center_pos) * 300.0
 		var pixel_w = max(n.width * 300.0 - 30.0, 20.0)
-		new_note.setup_visual(pixel_w, false, n.type)
 		track_bottom.add_child(new_note)
+		new_note.setup_visual(pixel_w, false, n.type)
+		
 		
 	elif n.side == "left":
 		new_note.position.x = -(actual_center_pos - track_center_pos) * 150.0 - side_up_offset
 		var pixel_w = max(n.width * 150.0 - 30.0, 20.0)
-		new_note.setup_visual(pixel_w, true, n.type)
 		track_left.add_child(new_note)
+		new_note.setup_visual(pixel_w, true, n.type)
+		
 		
 	elif n.side == "right":
 		new_note.position.x = (actual_center_pos - track_center_pos) * 150.0 + side_up_offset
 		var pixel_w = max(n.width * 150.0 - 30.0, 20.0)
-		new_note.setup_visual(pixel_w, true, n.type)
 		track_right.add_child(new_note)
+		new_note.setup_visual(pixel_w, true, n.type)
+		
 
 func _unhandled_input(event):
-	# ==========================================
-	# ★ AUTO 模式：絕對禁止人類干預！
-	# ==========================================
 	if Global.auto_play:
 		return
 
 	# 1. 處理真實的手指觸控
 	if event is InputEventScreenTouch:
-		has_touch_screen = true # ★ 只要摸過螢幕，就標記這台裝置有觸控功能！
+		has_touch_screen = true # ★ 只要摸過螢幕，就標記這台裝置有觸控功能
 		if event.pressed:
 			active_touches[event.index] = event.position
 			try_hit_note(event.position) 
 		else:
 			active_touches.erase(event.index) 
+			# ★ 終極防護：只要手放開，強制把可能卡住的假滑鼠也清掉
+			active_touches.erase(-1)
 			
 	elif event is InputEventScreenDrag:
 		active_touches[event.index] = event.position
 		
 	# 2. 處理滑鼠點擊 (加入過濾機制)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if has_touch_screen:
-			return # ★ 核心防呆：既然是用手指玩的，就直接無視引擎偷偷模擬出來的滑鼠點擊！
-			
 		if event.pressed:
+			if has_touch_screen:
+				return # 已經確認是觸控設備了，拒絕新增假滑鼠點擊
 			var mouse_pos = get_global_mouse_position()
 			active_touches[-1] = mouse_pos 
 			try_hit_note(mouse_pos)
 		else:
+			# ★ 核心修正：放開滑鼠時，無條件清除 -1！不再被 has_touch_screen 阻擋！
 			active_touches.erase(-1)
 			
 	elif event is InputEventMouseMotion:
 		if has_touch_screen:
-			return # ★ 同理，無視模擬出來的滑鼠移動
+			return 
 			
 		if active_touches.has(-1):
 			active_touches[-1] = get_global_mouse_position()
@@ -644,9 +780,7 @@ func try_hit_note(touch_pos: Vector2):
 						_show_feedback("PERFECT")
 					else:
 						_show_feedback("GOOD")
-				# 註：如果玩家提早點擊 (>0.059)，此處不做任何事。
-				# 它完美「吸收」了這次提早點擊，不會產生 EARLY MISS，符合原遊戲邏輯。
-				
+						timing_stats["LATE"] += 1
 			else:
 				# NORMAL / HOLD 判定
 				spawn_hit_effect(note, hit_color)
@@ -658,12 +792,17 @@ func try_hit_note(touch_pos: Vector2):
 		if ms_diff > 152 and ms_diff <= 234:
 			current_combo = 0
 			_show_feedback("MISS")
+			timing_stats["EARLY"] += normal_hit_count
 		elif abs(ms_diff) <= 59:
 			current_combo += normal_hit_count
 			_show_feedback("PERFECT")
 		elif abs(ms_diff) <= 152:
 			current_combo += normal_hit_count
 			_show_feedback("GOOD")
+			if ms_diff > 0:
+				timing_stats["EARLY"] += normal_hit_count
+			else:
+				timing_stats["LATE"] += normal_hit_count
 
 
 func check_chain_notes():
@@ -675,8 +814,7 @@ func check_chain_notes():
 			continue
 			
 		var t_diff = note.current_time_diff
-		
-		# 只要進入 Early 區間到漏接邊緣，都可以被觸發
+
 		if t_diff <= 0.059 and t_diff > -0.158:
 			var track = note.get_parent()
 			var is_caught = false
@@ -685,23 +823,9 @@ func check_chain_notes():
 			# ★ AUTO 模式攔截：自動在 PERFECT 時間接住 CHAIN
 			# ==========================================
 			if Global.auto_play:
-				if t_diff <= 0.07:
+				if t_diff <= 0.03:
 					is_caught = true
 					
-				var is_mixer = false
-				var current_paddle: Panel = null
-				
-				if track.name == "LeftTrack" and left_region == "MIXER":
-					is_mixer = true
-					current_paddle = left_paddle
-				elif track.name == "RightTrack" and right_region == "MIXER":
-					is_mixer = true
-					current_paddle = right_paddle
-					
-				if is_mixer and current_paddle != null:
-					# 讓盤子的中心對齊 CHAIN 音符的 X 座標
-					# 注意：盤子的 position.x 是左上角，所以要減去半寬 (97.5) 來置中
-					current_paddle.position.x = note.position.x - 97.5
 			else:
 				# 1. 判斷這顆音符所在的軌道，是不是 MIXER 模式？
 				var is_mixer = false
@@ -767,7 +891,88 @@ func check_chain_notes():
 					_show_feedback("PERFECT")
 				else:
 					_show_feedback("GOOD")
+					timing_stats["LATE"] += 1
 
+func _update_auto_mixer_movement(delta: float):
+	if left_region == "MIXER":
+		var target_track = track_right if Global.mirror_mode else track_left
+		var paddle = right_paddle if Global.mirror_mode else left_paddle
+		_process_single_mixer_auto(delta, target_track, paddle, "left", -422.5, 327.5)
+		
+	if right_region == "MIXER":
+		var target_track = track_left if Global.mirror_mode else track_right
+		var paddle = left_paddle if Global.mirror_mode else right_paddle
+		_process_single_mixer_auto(delta, target_track, paddle, "right", -522.5, 227.5)
+
+func _process_single_mixer_auto(delta: float, track: Node2D, paddle: Panel, side_key: String, min_x: float, max_x: float):
+	if paddle == null or track == null:
+		return
+		
+	var active_notes = get_tree().get_nodes_in_group("notes")
+	var candidates: Array = []
+	var min_time_diff: float = 999.0
+	
+	# 1. 搜尋該軌道上所有「未判定且即將到達」的 CHAIN
+	# 範圍：從剛過線 (-0.05s) 到未來 0.35s 內
+	for note in active_notes:
+		if note.get_parent() != track:
+			continue
+		if note.is_head_hit or note.type != "CHAIN":
+			continue
+			
+		var t_diff = note.current_time_diff
+		# 保留少許負值 (-0.05)，防止音符一碰線滑塊就立刻放棄追蹤
+		if t_diff <= 0.35 and t_diff > -0.05:
+			if candidates.is_empty():
+				candidates.append(note)
+				min_time_diff = t_diff
+			else:
+				# 時間差在 5ms 內視為同拍，加入隨機選擇候選池
+				if abs(t_diff - min_time_diff) <= 0.005:
+					candidates.append(note)
+				# 發現更早抵達的音符，重置候選名單
+				elif t_diff < min_time_diff:
+					candidates.clear()
+					candidates.append(note)
+					min_time_diff = t_diff
+					
+	# 2. 目標選定與切換
+	if not candidates.is_empty():
+		var current_locked_id = auto_mixer_locked_id[side_key]
+		var is_locked_still_valid = false
+		
+		# 檢查當前鎖定的音符是否依然存在於最優先的候選池內
+		for n in candidates:
+			if is_instance_valid(n) and n.get_instance_id() == current_locked_id:
+				is_locked_still_valid = true
+				break
+				
+		# 如果之前鎖定的音符已經被打掉/過期，或者換了新的一批音符，則重新隨機挑選
+		if not is_locked_still_valid:
+			var chosen_note = candidates.pick_random()
+			auto_mixer_locked_id[side_key] = chosen_note.get_instance_id()
+			auto_mixer_target_x[side_key] = chosen_note.position.x - 97.5
+	else:
+		auto_mixer_locked_id[side_key] = 0
+
+	# 3. 自適應平滑位移
+	if auto_mixer_target_x[side_key] != -999.0:
+		var target_clamped = clamp(auto_mixer_target_x[side_key], min_x, max_x)
+		var current_x = paddle.position.x
+		var dist_to_target = abs(target_clamped - current_x)
+		
+		# 剩餘時間越短，強制提高追蹤靈敏度
+		# 平常約 25.0，在密集的連續 SLIDE (時間 < 0.15s) 階段動態提升到 40.0~60.0
+		var remaining_time = max(min_time_diff, 0.01)
+		var speed_weight = clamp(1.0 / remaining_time, 25.0, 60.0)
+		
+		# 透過 lerpf 提供絲滑移動過程
+		paddle.position.x = lerpf(current_x, target_clamped, speed_weight * delta)
+		
+		# 保底機制：如果時間只剩不到 0.08 秒且距離還沒進入接球範圍，使用 move_toward 強制切入
+		if min_time_diff <= 0.08 and dist_to_target > 50.0:
+			var rush_speed = (dist_to_target / remaining_time) * 1.5
+			paddle.position.x = move_toward(paddle.position.x, target_clamped, rush_speed * delta)
 func check_hold_notes():
 	var active_notes = get_tree().get_nodes_in_group("notes")
 	
@@ -886,33 +1091,31 @@ func _init_blur_material():
 	var shader = Shader.new()
 	shader.code = """
 	shader_type canvas_item;
+	render_mode blend_add; // ★ 關鍵 1：改為加法混色，產生強烈光暈與穿透感，消除邊界感
 	
 	void fragment() {
-		// 取得 ColorRect 傳進來的顏色 (包含 hit_color)
 		vec4 base_color = COLOR;
 		
-		// ==========================================
-		// 1. X 軸的平滑邊緣 (模擬高斯模糊)
-		// ==========================================
-		// UV.x 範圍 0.0 ~ 1.0，0.5 是中心點。
-		// dist_x 算出來後，中心點是 0.0，最外緣是 1.0
-		float dist_x = abs(UV.x - 0.5) * 2.0; 
+		// 1. 水平 X 軸：使用平滑的高斯鐘形曲線衰減，消除直條邊界
+		// UV.x 居中後範圍為 [-1.0, 1.0]
+		float x_offset = (UV.x - 0.5) * 2.0;
+		// 藉由高斯指數 exp(-x^2 * 係數) 營造柔和無邊界的光霧
+		float glow_x = exp(-pow(x_offset * 1.75, 2.0));
 		
-		// smoothstep(0.5, 1.0) 代表：內部 50% 是純色，外部的 50% 進行平滑羽化淡出
-		float alpha_x = 1.0 - smoothstep(0.8, 1.0, dist_x);
+		// 2. 垂直 Y 軸：底部超亮、向上平滑淡出
+		// UV.y: 0.0 為頂部，1.0 為底部（判定線）
+		float glow_y = pow(UV.y, 1.3);
 		
-		// ==========================================
-		// 2. Y 軸的弱漸淡
-		// ==========================================
-		// UV.y 範圍 0.0(頂部) ~ 1.0(底部)
-		// smoothstep(0.0, 0.7) 代表：底部 30% 保持實心，往上慢慢變淡
-		float alpha_y = smoothstep(0.0, 0.7, UV.y);
-		float fade_out_bottom = 1.0 - smoothstep(0.98, 1.0, UV.y);
-		alpha_y = max(alpha_y, 0.10); 
+		// 3. 根部核心強光亮斑（模擬剛打擊時的刺眼核心光暈）
+		float core_intensity = pow(UV.y, 4.0) * glow_x * 0.8;
 		
-		// 合併透明度計算
-		base_color.a *= (alpha_x * alpha_y);
-		COLOR = base_color;
+		// 計算最終 Alpha 與顏色加成
+		float final_alpha = glow_x * glow_y;
+		
+		// 核心區域偏白，外圍保留打擊顏色 (如青色/綠色)
+		vec3 final_rgb = mix(base_color.rgb, vec3(1.0), core_intensity);
+		
+		COLOR = vec4(final_rgb, final_alpha * base_color.a);
 	}
 	"""
 	
@@ -957,32 +1160,30 @@ func spawn_hit_effect(note: Node2D, hit_color: Color):
 		var effect = ColorRect.new()
 		effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
-		# 1. 略寬一點 (比音符判定範圍多出 30 像素，讓邊緣羽化有空間發揮)
-		var wider_width = note.hit_width + 50.0
+		# ★ 讓光暈寬度大幅向外擴展，給予光霧自然消散的空間
+		var wider_width = max(note.hit_width * 2.0, note.hit_width + 120.0)
 		effect.size = Vector2(wider_width, effect_height)
 		
-		# 2. 定位 (X 軸需要扣掉加寬的一半來維持中心對齊)
+		# 重新居中
 		effect.position = Vector2(note.position.x - (wider_width / 2.0), -effect_height + 25.0)
 		
-		# 3. 套用 Shader 與顏色
 		effect.material = blur_effect_material
-		effect.color = hit_color # 直接給予顏色，Shader 的 COLOR 會自動接收
+		effect.color = hit_color
 		
 		note.get_parent().add_child(effect)
 		
-		# 4. 動畫 (與你原本的邏輯相同，往上飄並整體淡出)
+		# 動畫：向上微浮並漸隱
 		var t = create_tween().set_parallel(true)
-		t.tween_property(effect, "position:y", effect.position.y - 30.0, 0.2)
-		t.tween_property(effect, "modulate:a", 0.0, 0.2)
+		t.tween_property(effect, "position:y", effect.position.y - 25.0, 0.22).set_ease(Tween.EASE_OUT)
+		t.tween_property(effect, "modulate:a", 0.0, 0.22).set_ease(Tween.EASE_IN)
 		t.chain().tween_callback(effect.queue_free)
+		
+		
+	_play_pooled_particle(note.get_parent(), note.position.x, note.hit_width, hit_color)
 	
 func reset_combo_from_miss():
 	current_combo = 0
 	_show_feedback("MISS")
-
-# ==========================================
-# ★ 暫停系統
-# ==========================================
 
 func _on_pause_button_pressed():
 	if get_tree().paused:
@@ -1001,7 +1202,7 @@ func _on_restart_button_pressed():
 
 func _on_quit_button_pressed():
 	#back to Song Select
-	Transition.change_scene("uid://dcrdq7tlb21h")
+	Transition.change_scene("uid://nfkrp5p1relk")
 
 func _play_ap_animation():
 	# 1. 初始化狀態
@@ -1031,9 +1232,6 @@ func _play_ap_animation():
 	tween.chain().tween_property(ap_label, "modulate:a", 1.0, 0.1)
 	tween.parallel().tween_property(ap_label, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	
-	# ★ 核心加入：在字體縮放「砸」到畫面上的同一瞬間，用 tween_callback 觸發粒子爆發！
-	
-	
 	# [階段 4] 短暫延遲停留
 	tween.tween_interval(2.0)
 	
@@ -1052,6 +1250,9 @@ func _play_ap_animation():
 # ★ 結算畫面核心邏輯
 # ==========================================
 func _show_result_screen():
+	if is_game_ended:
+		return
+	is_game_ended = true
 	get_tree().paused = true
 	pause_button.visible = false
 	track_bottom.visible = false
@@ -1062,103 +1263,12 @@ func _show_result_screen():
 	stats_label.visible = false
 	downrect.visible = false
 	song_label.visible = false
-	
-	var total_notes_judged = judge_stats["PERFECT"] + judge_stats["GOOD"] + judge_stats["MISS"]
-	var final_score = 0
-	var rank = "F"
-	var rank_color = "#FFFFFF" 
-	
-	var song_id = Global.current_song_data.get("id", Global.current_song_data.get("title", "unknown_song"))
-	var diff_type = Global.current_chart_path.get_file().get_basename()
-	if result_diff_line != null:
-		var diff_color = _get_diff_color(diff_type)
-		result_diff_line.color = diff_color
-	# ==========================================
-	# ★ AUTO 模式結算攔截：顯示 AUTO 且不儲存分數
-	# ==========================================
-	if Global.auto_play:
-		final_score = 0
-		rank = "AUTO"
-		rank_color = "#00FFFF" # 青藍色專屬標籤
-		result_details_label.text = "AUTO PLAY\n\nPERFECT: %d\nGOOD: 0\nMISS: 0" %total_notes_judged
-	else:
-		# 正常遊玩模式計分與存檔
-		if total_notes_judged > 0:
-			var raw_score = (judge_stats["PERFECT"] * 1.0 + judge_stats["GOOD"] * 0.65) / total_notes_judged
-			final_score = int(raw_score * 1000000)
-			
-		if Global.has_method("save_new_score"):
-			Global.save_new_score(song_id, diff_type, final_score)
-			
-		if final_score >= 1000000:
-			rank = "Ω"
-			rank_color = "#4DFFFF"
-		elif final_score >= 990000:
-			rank = "Ψ"
-			rank_color = "#FFFF37" 
-		elif final_score >= 980000:
-			rank = "Χ"
-			rank_color = "#FF0000" 
-		elif final_score >= 960000:
-			rank = "A"
-			rank_color = "#FFDC35"
-		elif final_score >= 900000:
-			rank = "B"
-			rank_color = "#73BF00"
-		elif final_score >= 800000:
-			rank = "C"
-			rank_color = "#0066CC"
-		elif final_score >= 700000:
-			rank = "D"
-			rank_color = "#8B4513"
-		elif final_score >= 600000:
-			rank = "E"
-			rank_color = "#A9A9A9"
-		else:
-			rank = "F"
-			rank_color = "#000000"
-		
-		result_details_label.text = "MAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
-			max_combo,
-			judge_stats["PERFECT"],
-			judge_stats["GOOD"],
-			judge_stats["MISS"]
-		]
-		
-		if judge_stats["MISS"] == 0 and total_notes_judged > 0:
-			if judge_stats["GOOD"] == 0:
-				result_details_label.text = "ALL PERFECT\n\nMAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
-					max_combo,
-					judge_stats["PERFECT"],
-					judge_stats["GOOD"],
-					judge_stats["MISS"]
-				]
-			else:
-				result_details_label.text = "FULL COMBO\n\nMAX COMBO: %d\n\nPERFECT: %d\nGOOD: %d\nMISS: %d" % [
-					max_combo,
-					judge_stats["PERFECT"],
-					judge_stats["GOOD"],
-					judge_stats["MISS"]
-				]
-				
-		
-	# ==========================================
+	if progress_bar:
+		progress_bar.visible = false
 
-	result_song_label.text = Global.current_song_data["title"]
-	result_score_label.text = "[left]SCORE: %07d\nRANK : [color=%s]%s[/color][/left]" % [final_score, rank_color, rank]
+	# 呼叫獨立場景展示結果
+	result_screen.setup_and_show(judge_stats, max_combo, timing_stats)
 	
-	result_menu.modulate.a = 0.0 
-	result_menu.scale = Vector2(0.8, 0.8) 
-	result_menu.pivot_offset = result_menu.size / 2.0 
-	result_menu.process_mode = Node.PROCESS_MODE_ALWAYS 
-	result_menu.visible = true
-	
-	var tween = create_tween()
-	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS) 
-	tween.set_parallel(true) 
-	tween.tween_property(result_menu, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.tween_property(result_menu, "scale", Vector2.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
 func load_external_audio(path: String) -> AudioStream:
 	if path.begins_with("res://"):
 		return load(path)
@@ -1198,15 +1308,14 @@ func load_external_image(path: String) -> Texture2D:
 	return null
 
 func _get_diff_color(diff_raw: String) -> Color:
-	var upper_diff = diff_raw.to_upper() # 防呆：強制轉大寫比對
+	var upper_diff = diff_raw.to_upper()
 	if "NORMAL" in upper_diff: return Color(0, 0.55, 0.65)
 	elif "HARD" in upper_diff: return Color(0.95, 0.2, 0.25) 
 	elif "MEGA" in upper_diff: return Color(0.6, 0.2, 0.8)
 	elif "GIGA" in upper_diff: return Color(0.4, 0.4, 0.4)
 	elif "CASUAL" in upper_diff: return Color(0, 0.8, 0.5)
 	elif "TERA" in upper_diff: return Color(0, 0, 0)
-	
-	# 如果都沒配對到，給一個預設的灰色
+
 	return Color(0.5, 0.5, 0.5)
 
 # ==========================================
@@ -1243,3 +1352,18 @@ func _update_offset_label():
 		var current_offset = Global.current_song_data.get("song_offset", 0.0)
 		# 顯示到小數點後 3 位 (毫秒)
 		offset_label.text = "Offset\n%+.2fs" % current_offset
+
+func _notification(what):
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_force_pause()
+
+func _force_pause():
+	if get_tree().paused:
+		return
+	if result_screen.visible or is_ap_animating:
+		return
+	get_tree().paused = true
+	audio_player.stream_paused = true
+	pause_menu.visible = true
+	if pause_button:
+		pause_button.text = "▶"

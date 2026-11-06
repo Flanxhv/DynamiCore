@@ -4,7 +4,8 @@ extends Control
 @onready var cloud_downloader = $CloudDownloader
 @onready var back_button = $BackButton
 @onready var search_box = $SearchBox
-
+@onready var search_timer: Timer = Timer.new()
+var _pending_search_query: String = ""
 #download card
 var card_scene = preload("uid://dap52n7jsrtn5")
 var all_cloud_songs: Array = []
@@ -23,16 +24,25 @@ func _ready():
 	
 	if search_box:
 		search_box.text_changed.connect(_on_search_text_changed)
-		
+	search_timer.one_shot = true
+	search_timer.wait_time = 0.3  # 延遲 300 毫秒（通常 0.25 ~ 0.4 秒手感最佳）
+	search_timer.timeout.connect(_execute_search)
+	add_child(search_timer)
 	# 綁定網路請求
 	cloud_downloader.request_completed.connect(_on_list_downloaded)
 	
 	# 向你的 JSON 網址發送請求
-	var url = "https://pub-19d1e53d80d84a4498c2b40adbfe578b.r2.dev/cloud_songs.json"
-	print("📡 正在獲取雲端譜面列表...")
+	var url = "https://pub-19d1e53d80d84a4498c2b40adbfe578b.r2.dev/songs_list.json"
 	cloud_downloader.request(url)
 	
-func _on_search_text_changed(query: String = ""):
+func _on_search_text_changed(query: String = "") -> void:
+	_pending_search_query = query
+	search_timer.start() # 每次打字都會重設倒數時間
+
+# 2. 停止打字 0.3 秒後，才真正執行篩選與載入
+func _execute_search() -> void:
+	var query = _pending_search_query
+	
 	# 先把原本畫面上的所有卡片清空
 	for child in list_container.get_children():
 		child.queue_free()
@@ -40,26 +50,20 @@ func _on_search_text_changed(query: String = ""):
 	var filtered_songs: Array = []
 	var query_lower = query.strip_edges().to_lower()
 	
-	# 1. 篩選邏輯
+	# 篩選邏輯
 	if query_lower == "":
-		# 如果搜尋框是空的，就拿全部的歌來準備
 		filtered_songs = all_cloud_songs.duplicate()
 	else:
-		# 如果有打字，就進行過濾
 		for song in all_cloud_songs:
 			var s_title = song.get("title", "").to_lower()
 			var s_artist = song.get("artist", "").to_lower()
 			var s_charter = song.get("charter", "").to_lower()
 			
-			if query_lower in s_title or query_lower in s_artist or query_lower in s_charter :
+			if query_lower in s_title or query_lower in s_artist or query_lower in s_charter:
 				filtered_songs.append(song)
 				
-	# ==========================================
-	# ★ 核心魔法：限制生成數量 (無聲無息地拯救效能)
-	# ==========================================
 	var display_songs = []
 	if filtered_songs.size() > MAX_DISPLAY:
-		# 如果符合條件的歌超過 50 首，我們只切出前 50 首來顯示
 		display_songs = filtered_songs.slice(0, MAX_DISPLAY)
 	else:
 		display_songs = filtered_songs
@@ -78,13 +82,10 @@ func _on_list_downloaded(result, response_code, headers, body):
 			var initial_query = search_box.text if search_box else ""
 			_on_search_text_changed(initial_query)
 		else:
-			print("JSON 解析失敗")
+			Toast.show_toast("Load failed: songs_list.json")
 	else:
-		print("網路請求失敗: ", response_code)
-
-# ==========================================
-# ★ 縱二橫向卷軸生成器
-# ==========================================
+		Toast.show_toast("Request failed. Error code: "+response_code)
+		
 func _generate_card_grid(songs: Array):
 	var current_vbox: VBoxContainer = null
 	

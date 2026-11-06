@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://be687swoivxd6"]
+
+[ext_resource type="Script" uid="uid://bpcn5vjcoq4wu" path="res://gd/song_list_item.gd" id="1_oq335"]
+[ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="1_thk4q"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_oq335"]
+font = ExtResource("1_thk4q")
+font_size = 46
+
+[node name="SongListItem" type="MarginContainer" unique_id=1864488833]
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+theme_override_constants/margin_right = 65
+script = ExtResource("1_oq335")
+
+[node name="BgButton" type="Button" parent="." unique_id=836022803]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+mouse_filter = 2
+flat = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BgButton" unique_id=667033452]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="RankedBar" type="ColorRect" parent="BgButton/HBoxContainer" unique_id=723320209]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+color = Color(1, 1, 0, 1)
+
+[node name="LoveBar" type="ColorRect" parent="BgButton/HBoxContainer" unique_id=14970532]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+color = Color(0.99999243, 0.17980325, 0.6215807, 1)
+
+[node name="TitleLabel" type="Label" parent="BgButton/HBoxContainer" unique_id=1316165452]
+custom_minimum_size = Vector2(670, 0)
+layout_mode = 2
+text = "TEST"
+label_settings = SubResource("LabelSettings_oq335")
+text_overrun_behavior = 5

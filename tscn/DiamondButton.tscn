@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://dp2xcfnf6hw3x"]
+
+[ext_resource type="Script" uid="uid://bfodw0es4xxis" path="res://gd/diamond_button.gd" id="1_4e2kp"]
+[ext_resource type="FontFile" uid="uid://b6g600ba74gne" path="res://ttf/DynamixFeatureStandard.ttf" id="2_4e2kp"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_g65hq"]
+font = ExtResource("2_4e2kp")
+font_size = 30
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+
+[node name="DiamondButton" type="Button" unique_id=495659048]
+custom_minimum_size = Vector2(150, 150)
+pivot_offset = Vector2(75, 75)
+script = ExtResource("1_4e2kp")
+
+[node name="Label" type="Label" parent="." unique_id=283618833]
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+rotation = -0.7853982
+pivot_offset = Vector2(75, 75)
+text = "TEST"
+label_settings = SubResource("LabelSettings_g65hq")
+horizontal_alignment = 1
+vertical_alignment = 1

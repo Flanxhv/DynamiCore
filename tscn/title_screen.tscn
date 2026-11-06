@@ -3,15 +3,22 @@
 [ext_resource type="Script" uid="uid://c7fwk8bm8eyvg" path="res://gd/title_screen.gd" id="1_v6p8y"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="2_ak2if"]
 [ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_ig5kc"]
+[ext_resource type="FontFile" uid="uid://76j41mb1t8ey" path="res://ttf/Orbitron-VariableFont_wght.ttf" id="4_u1mb5"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_ak2if"]
 font = ExtResource("2_ak2if")
-font_size = 100
+font_size = 80
 font_color = Color(0.5254902, 1, 1, 1)
-outline_size = 7
 outline_color = Color(0, 0, 0, 1)
-shadow_size = 15
+shadow_size = 7
 shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_5soae"]
+font = ExtResource("4_u1mb5")
+font_size = 200
+font_color = Color(0, 0.3491902, 0.8123662, 1)
+outline_size = 12
+outline_color = Color(0.19641912, 0.19641912, 0.19641912, 0.633)
 
 [node name="TitleScreen" type="Control" unique_id=343611128]
 layout_mode = 3
@@ -29,7 +36,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.87070966, 0.8707098, 0.87070966, 1)
 
 [node name="BgParticles" parent="." unique_id=349948908 instance=ExtResource("2_ig5kc")]
 
@@ -46,6 +52,8 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "TAP to START"
 label_settings = SubResource("LabelSettings_ak2if")
+horizontal_alignment = 1
+vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Button" type="Button" parent="." unique_id=599861058]
@@ -61,5 +69,23 @@ offset_right = 800.0
 grow_horizontal = 2
 grow_vertical = 0
 flat = true
+
+[node name="TitleLabel" type="Label" parent="." unique_id=737932573]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -677.0
+offset_top = -223.0
+offset_right = 677.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "DynamiCore"
+label_settings = SubResource("LabelSettings_5soae")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

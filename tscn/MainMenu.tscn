@@ -5,25 +5,67 @@
 [ext_resource type="PackedScene" uid="uid://cxrp220owltfb" path="res://tscn/BgParticles.tscn" id="2_h7a2f"]
 [ext_resource type="Shader" uid="uid://cuxbkp5gy2pca" path="res://tscn/FrostedGlass.gdshader" id="3_lf5xi"]
 [ext_resource type="StyleBox" uid="uid://mxeiauawvhii" path="res://tres/main_menu_style_box_flat.tres" id="4_4wa2v"]
-[ext_resource type="Texture2D" uid="uid://ba5upex7q4yyp" path="res://pic/test.png" id="4_yqkob"]
+[ext_resource type="Texture2D" uid="uid://cn07vtl076cg2" path="res://pic/tokem.png" id="4_o2u1m"]
 [ext_resource type="Script" uid="uid://trcieyrpulyx" path="res://gd/main_menu_button.gd" id="5_nfaoi"]
 [ext_resource type="Script" uid="uid://c6dhdx7qr52kx" path="res://gd/character_button.gd" id="5_o2u1m"]
+[ext_resource type="Script" uid="uid://chry5hbl74m5b" path="res://gd/dialogue_group.gd" id="6_bopfr"]
 [ext_resource type="LabelSettings" uid="uid://dph0fjunkk5ps" path="res://tres/label_settings.tres" id="6_c3tst"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yqkob"]
 shader = ExtResource("3_lf5xi")
-shader_parameter/blur_amount = 1.5
-shader_parameter/tint_color = Color(0.1, 0.1, 0.1, 0.2)
 shader_parameter/split_x = 0.65
-shader_parameter/slant = -0.1
-shader_parameter/line_thickness = 0.004
-shader_parameter/line_color = Color(0.4, 0.8, 1, 0.5)
+shader_parameter/slant = 0.1
+shader_parameter/drop_shadow_width_px = 35.0
+shader_parameter/drop_shadow_opacity = 0.45
+shader_parameter/rim_light_color = Color(0.4, 0.85, 1, 0.85)
+shader_parameter/rim_light_width_px = 1.2
+
+[sub_resource type="Resource" id="Resource_bdc1s"]
+script = ExtResource("6_bopfr")
+dialogue_keys = Array[String](["CLANITE_INTRO_01", "CLANITE_INTRO_02", "CLANITE_INTRO_03"])
+play_once = true
+metadata/_custom_type_script = "uid://chry5hbl74m5b"
+
+[sub_resource type="Resource" id="Resource_c3tst"]
+script = ExtResource("6_bopfr")
+dialogue_keys = Array[String](["CLANITE_SYSTEM_01", "CLANITE_SYSTEM_02", "CLANITE_SYSTEM_03"])
+play_once = true
+metadata/_custom_type_script = "uid://chry5hbl74m5b"
+
+[sub_resource type="Resource" id="Resource_bopfr"]
+script = ExtResource("6_bopfr")
+dialogue_keys = Array[String](["CLANITE_IDLE_01"])
+metadata/_custom_type_script = "uid://chry5hbl74m5b"
+
+[sub_resource type="Resource" id="Resource_sbfrd"]
+script = ExtResource("6_bopfr")
+dialogue_keys = Array[String](["CLANITE_IDLE_02"])
+metadata/_custom_type_script = "uid://chry5hbl74m5b"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bopfr"]
 bg_color = Color(0.52305055, 0.52305055, 0.52305055, 1)
 shadow_color = Color(0.30153242, 0.90382373, 1, 0.614)
 shadow_size = 12
 shadow_offset = Vector2(12, 10)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c3tst"]
+bg_color = Color(0.11207495, 0.9251009, 0.9699511, 0.51000005)
+border_width_right = 11
+border_width_bottom = 11
+border_color = Color(0, 0, 0, 0.43300003)
+
+[sub_resource type="LabelSettings" id="LabelSettings_c3tst"]
+font = ExtResource("2_eiy7p")
+font_size = 100
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 11
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_bopfr"]
+font = ExtResource("2_eiy7p")
+font_size = 60
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 1)
 
 [node name="MainMenu" type="Control" unique_id=620197947]
 layout_mode = 3
@@ -55,13 +97,15 @@ grow_vertical = 2
 
 [node name="CharacterButton" type="TextureButton" parent="." unique_id=559264471]
 layout_mode = 0
-offset_left = 1356.0
-offset_top = 316.0
-offset_right = 1837.0
-offset_bottom = 1078.0
+anchor_left = 0.67291665
+anchor_top = 0.19444445
+anchor_right = 0.98541665
+anchor_bottom = 0.9
 focus_mode = 0
-texture_normal = ExtResource("4_yqkob")
+texture_normal = ExtResource("4_o2u1m")
 script = ExtResource("5_o2u1m")
+dialogue_groups = Array[ExtResource("6_bopfr")]([SubResource("Resource_bdc1s"), SubResource("Resource_c3tst"), SubResource("Resource_bopfr"), SubResource("Resource_sbfrd")])
+metadata/_edit_use_anchors_ = true
 
 [node name="Bubble" type="PanelContainer" parent="CharacterButton" unique_id=352574128]
 visible = false
@@ -89,48 +133,134 @@ text = "?????"
 label_settings = ExtResource("6_c3tst")
 autowrap_mode = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1843824201]
-layout_mode = 1
-anchors_preset = -1
+[node name="ChooseSongButton" type="Button" parent="." unique_id=975638601]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 0
 anchor_left = 0.14583333
-anchor_top = 0.32777777
-anchor_right = 0.4963542
-anchor_bottom = 0.60555553
-offset_top = 14.0
-offset_bottom = -14.0
-grow_vertical = 2
-theme_override_constants/separation = 60
+anchor_top = 0.24444444
+anchor_right = 0.49635416
+anchor_bottom = 0.35555556
+theme_override_fonts/font = ExtResource("2_eiy7p")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = ExtResource("4_4wa2v")
+text = "PLAY"
+script = ExtResource("5_nfaoi")
 metadata/_edit_use_anchors_ = true
 
-[node name="ChooseSongButton" type="Button" parent="VBoxContainer" unique_id=975638601]
+[node name="ChartButton" type="Button" parent="." unique_id=2084429656]
 custom_minimum_size = Vector2(0, 120)
-layout_mode = 2
+layout_mode = 0
+anchor_left = 0.14583333
+anchor_top = 0.41111112
+anchor_right = 0.49635416
+anchor_bottom = 0.5222222
 theme_override_fonts/font = ExtResource("2_eiy7p")
 theme_override_font_sizes/font_size = 50
 theme_override_styles/normal = ExtResource("4_4wa2v")
-text = "Play"
-script = ExtResource("5_nfaoi")
-
-[node name="ChartButton" type="Button" parent="VBoxContainer" unique_id=2084429656]
-custom_minimum_size = Vector2(0, 120)
-layout_mode = 2
-theme_override_fonts/font = ExtResource("2_eiy7p")
-theme_override_font_sizes/font_size = 50
-theme_override_styles/normal = ExtResource("4_4wa2v")
-text = "Chart
+text = "CHART
 "
 script = ExtResource("5_nfaoi")
+metadata/_edit_use_anchors_ = true
 
-[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=747982940]
+[node name="CreditButton" type="Button" parent="." unique_id=747982940]
 custom_minimum_size = Vector2(0, 120)
-layout_mode = 2
+layout_mode = 0
+offset_left = 280.0
+offset_top = 624.0
+offset_right = 610.0
+offset_bottom = 744.0
 theme_override_fonts/font = ExtResource("2_eiy7p")
 theme_override_font_sizes/font_size = 50
 theme_override_styles/normal = ExtResource("4_4wa2v")
-text = "Quit"
+text = "CREDIT"
 script = ExtResource("5_nfaoi")
 
-[connection signal="pressed" from="VBoxContainer/ChooseSongButton" to="." method="_on_play_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/ChartButton" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/ChartButton" to="." method="_on_chart_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
+[node name="UploadButton" type="Button" parent="." unique_id=887708718]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 0
+offset_left = 646.0
+offset_top = 624.0
+offset_right = 976.0
+offset_bottom = 744.0
+theme_override_fonts/font = ExtResource("2_eiy7p")
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = ExtResource("4_4wa2v")
+text = "IMPORT"
+script = ExtResource("5_nfaoi")
+
+[node name="CreditModal" type="Control" parent="." unique_id=360058131]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Mask" type="ColorRect" parent="CreditModal" unique_id=589006469]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.24780053, 0.24780053, 0.24780053, 0.87600005)
+
+[node name="DialogPanel" type="PanelContainer" parent="CreditModal" unique_id=667284250]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -700.0
+offset_top = -500.0
+offset_right = 700.0
+offset_bottom = 500.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_c3tst")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CreditModal/DialogPanel" unique_id=298283000]
+custom_minimum_size = Vector2(1300, 900)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="TitleLabel" type="Label" parent="CreditModal/DialogPanel/VBoxContainer" unique_id=481429049]
+layout_mode = 2
+text = "Credits"
+label_settings = SubResource("LabelSettings_c3tst")
+
+[node name="ContentLabel" type="Label" parent="CreditModal/DialogPanel/VBoxContainer" unique_id=83112911]
+custom_minimum_size = Vector2(1300, 0)
+layout_mode = 2
+text = "
+DynamiCore is a non-commercial project.
+Thank you for playing!
+
+Authorized Songs and Artworks:
+
+1.Rain then clear
+Composer: kuro (X: @taikokuro96)
+Illustrator : me"
+label_settings = SubResource("LabelSettings_bopfr")
+autowrap_mode = 3
+
+[node name="CloseButton" type="Button" parent="CreditModal/DialogPanel" unique_id=230302598]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 50
+text = "X"
+flat = true
+
+[node name="FileDialog" type="FileDialog" parent="." unique_id=1055701348]
+
+[connection signal="pressed" from="ChooseSongButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="ChartButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="ChartButton" to="." method="_on_chart_button_pressed"]
+[connection signal="pressed" from="CreditButton" to="." method="_on_credit_button_pressed"]
+[connection signal="pressed" from="UploadButton" to="." method="_on_upload_button_pressed"]
