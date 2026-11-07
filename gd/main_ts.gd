@@ -60,7 +60,7 @@ var particle_pool_indices: Dictionary = {
 }
 
 const HOLD_PARTICLES_SCENE = preload("res://tscn/HoldParticles.tscn")
-const HOLD_POOL_SIZE_PER_TRACK: int = 4 # 每軌同時間能發射長條粒子的上限（一般 4 根綽綽有餘）
+const HOLD_POOL_SIZE_PER_TRACK: int = 8 # 每軌同時間能發射長條粒子的上限（一般 4 根綽綽有餘）
 
 var hold_particle_pools: Dictionary = {
 	"BottomTrack": [],
@@ -254,6 +254,8 @@ func _init_hold_particle_pools():
 
 # 開始 HOLD 特效（租借粒子節點）
 func start_hold_effect(note: Node2D):
+	if not Global.particle_effect_style:
+		return
 	var track = note.get_parent()
 	if track == null or not hold_particle_pools.has(track.name):
 		return
@@ -307,6 +309,9 @@ func stop_hold_effect(note: Node2D):
 	)
 	
 func _play_pooled_particle(track_node: Node2D, note_x: float, width: float, color: Color):
+	if not Global.particle_effect_style:
+		return
+	
 	var track_name = track_node.name
 	if not particle_pools.has(track_name):
 		return

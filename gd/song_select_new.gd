@@ -71,6 +71,7 @@ var filter_panel_base_y: float = 0.0
 @onready var speed_slider = $SettingsPanel/SpeedSlider
 @onready var speed_label = $SettingsPanel/SpeedLabel
 @onready var effect_style_toggle = $SettingsPanel/EffectStyleToggle
+@onready var particle_style_toggle = $SettingsPanel/ParicleStyleToggle
 @onready var offset_slider = $SettingsPanel/OffsetSlider
 @onready var offset_label = $SettingsPanel/OffsetLabel
 @onready var brightness_slider = $SettingsPanel/BrightnessSlider
@@ -136,6 +137,9 @@ func _ready():
 	if effect_style_toggle:
 		effect_style_toggle.button_pressed = Global.hit_effect_style
 		effect_style_toggle.toggled.connect(_on_effect_style_toggled)
+	if particle_style_toggle:
+		particle_style_toggle.button_pressed = Global.particle_effect_style
+		particle_style_toggle.toggled.connect(_on_particle_style_toggled)
 	_update_setting_labels()
 	
 	speed_slider.value_changed.connect(_on_speed_changed)
@@ -949,16 +953,21 @@ func _on_brightness_changed(value: float):
 	Global.save_settings()
 
 func _on_effect_changed(value: float):
-	# ... (維持原樣) ...
 	Global.effect_height_ratio = value
 	_update_setting_labels()
 	Global.save_settings()
+	
 func _on_effect_style_toggled(toggled_on: bool):
 	Global.hit_effect_style = toggled_on
 	Global.save_settings()
 	if Global.has_method("play_click"):
 		UiSoundManager.play_click()
 
+func _on_particle_style_toggled(toggled_on: bool):
+	Global.particle_effect_style = toggled_on
+	Global.save_settings()
+	if Global.has_method("play_click"):
+		UiSoundManager.play_click()
 
 func _update_bg_cover(song_data: Dictionary):
 	var cover_path = song_data.get("cover_path", "")

@@ -8,17 +8,18 @@ var device_offset: float = 0.00    # 裝置聲音延遲校準 (單位：秒)
 var bg_brightness: float = 0.4    # 背景暗化亮度 (0.0 全黑 ~ 1.0 原圖)
 var effect_height_ratio = 1.0 
 var hit_effect_style: bool = false
+var particle_effect_style: bool = false
 var song_list: Array = [
 	{
-		"id": "base_song_03", # 確保有給一個唯一的 ID 用來存分數
+		"id": "base_song_03",
 		"title": "Rain then clear",
 		"artist": "kuro",
 		"charter": "flanxhv\n*Song copyright is held by the artist, and used in this game with permission.",
 		"folder_path": "res://built_in_songs/base_3/",
-		"audio_path": "res://built_in_songs/base_3/music.mp3", # 或 .mp3
+		"audio_path": "res://built_in_songs/base_3/music.mp3",
 		"preview_path": "res://built_in_songs/base_3/music.mp3",
 		"cover_path": "res://built_in_songs/base_3/cover.png",
-		"difficulty": ["MEGA 13"], # 填入這首歌有的難度
+		"difficulty": ["MEGA 13"],
 		"ranked": false,
 		"loved": false
 	}
@@ -112,7 +113,8 @@ func save_settings():
 		"note_speed_mult": note_speed_mult,
 		"bg_brightness": bg_brightness,
 		"effect_height_ratio": effect_height_ratio,
-		"hit_effect_style": hit_effect_style
+		"hit_effect_style": hit_effect_style,
+		"particle_effect_style": particle_effect_style
 	}
 	
 	var file = FileAccess.open(settings_path, FileAccess.WRITE)
@@ -132,6 +134,7 @@ func load_settings():
 			bg_brightness = data.get("bg_brightness", 0.4)
 			effect_height_ratio = data.get("effect_height_ratio", 1.0)
 			hit_effect_style = data.get("hit_effect_style", false)
+			particle_effect_style = data.get("particle_effect_style",false)
 
 # ==========================================
 # ★ 新增：單曲專屬校準值的讀寫系統
