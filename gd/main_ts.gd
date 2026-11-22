@@ -212,8 +212,11 @@ func _prewarm_shaders():
 	dummy.modulate.a = 0.001
 	dummy.size = Vector2(1, 1)
 	add_child(dummy)
-	get_tree().process_frame.connect(func(): dummy.queue_free(), CONNECT_ONE_SHOT)
-
+	get_tree().process_frame.connect(func(): 
+		if is_instance_valid(dummy):
+			dummy.queue_free()
+	, CONNECT_ONE_SHOT)
+	
 func _init_particle_pools():
 	var tracks = {
 		"BottomTrack": track_bottom,
@@ -278,9 +281,9 @@ func start_hold_effect(note: Node2D):
 		return # 池子已滿（防呆）
 		
 	# 設定粒子發射位置與範圍 (鎖定在判定線上)
+	# amount 已固定在 HoldParticles.tscn，執行期不可改（會重新分配緩衝區造成卡頓）
 	available_particle.position = Vector2(note.position.x, 0.0)
 	available_particle.emission_rect_extents = Vector2(note.hit_width / 2.0, 4.0)
-	available_particle.amount = clampi(int(note.hit_width * 0.08), 16, 45)
 	
 	available_particle.visible = true
 	available_particle.restart()
@@ -304,7 +307,8 @@ func stop_hold_effect(note: Node2D):
 	# 等待當前已噴出在空中的粒子自然消失後隱藏備用
 	var timer = get_tree().create_timer(p.lifetime)
 	timer.timeout.connect(func():
-		if not p.emitting:
+		
+		if is_instance_valid(p) and not p.emitting:
 			p.visible = false
 	)
 	
@@ -500,9 +504,13 @@ func _process(delta):
 	var actual_audio_time = audio_player.get_playback_position() + AudioServer.get_time_since_last_mix() - AudioServer.get_output_latency() 
 	if progress_bar:
 		progress_bar.value = actual_audio_time
-	# 如果我們的平滑時間跟真實音樂時間差超過 20 毫秒 (0.02秒)，才輕微地拉回來同步
-	if abs(game_time - actual_audio_time) > 0.02:
-		game_time = lerp(game_time, actual_audio_time, 0.5)
+	
+	# 平滑追蹤：小誤差緩慢收斂（不會讓音符瞬間跳動），差太多（如暫停回來）才直接重設
+	var time_err = actual_audio_time - game_time
+	if abs(time_err) > 0.1:
+		game_time = actual_audio_time
+	else:
+		game_time += time_err * clampf(delta * 5.0, 0.0, 1.0)
 	
 	var current_time = game_time
 	

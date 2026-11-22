@@ -4,6 +4,13 @@
 [ext_resource type="Texture2D" uid="uid://dotkfj0b8brb" path="res://sounds/thumb_set.png" id="2_f5vjx"]
 [ext_resource type="FontFile" uid="uid://dnbfr5d2wqfw0" path="res://ttf/jf-openhuninn-2.1.ttf" id="3_e2fgw"]
 
+[sub_resource type="Gradient" id="Gradient_ueb4u"]
+offsets = PackedFloat32Array(0.80569947, 1)
+colors = PackedColorArray(0, 0.747735, 1, 0.5, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rbpik"]
+gradient = SubResource("Gradient_ueb4u")
+
 [sub_resource type="LabelSettings" id="LabelSettings_5dtx1"]
 font = ExtResource("3_e2fgw")
 font_size = 30
@@ -23,13 +30,13 @@ font_color = Color(1, 1, 0.3055162, 1)
 outline_size = 14
 outline_color = Color(0.22971639, 0.42674685, 0.5451485, 1)
 
-[node name="DownloadCard" type="ColorRect" unique_id=373810972]
+[node name="DownloadCard" type="TextureRect" unique_id=667614423]
 custom_minimum_size = Vector2(750, 400)
 offset_top = 215.0
 offset_right = 750.0
 offset_bottom = 615.0
 mouse_filter = 2
-color = Color(0.07444572, 0.07444573, 0.07444569, 0.8)
+texture = SubResource("GradientTexture1D_rbpik")
 script = ExtResource("1_o40j8")
 
 [node name="CoverImage" type="TextureRect" parent="." unique_id=1001565120]

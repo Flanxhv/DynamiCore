@@ -12,6 +12,7 @@ colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
 
 [node name="HitParticles" type="CPUParticles2D" unique_id=1949142916]
 emitting = false
+amount = 16
 texture = ExtResource("1_oh4ce")
 lifetime = 0.45
 one_shot = true

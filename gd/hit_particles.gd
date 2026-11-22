@@ -1,16 +1,8 @@
 extends CPUParticles2D
 
+# amount 與 emission_shape 已固定在 .tscn，執行期不要再改
+# （改 amount 會重新分配粒子緩衝區，是命中瞬間卡頓的主因）
+# restart() / emitting 統一由 main_ts.gd 的 _play_pooled_particle 處理
 func setup(pixel_width: float, hit_color: Color):
 	color = hit_color
-	emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-
 	emission_rect_extents = Vector2(pixel_width / 2.0, 5.0)
-
-	var base_amount = int(pixel_width * 0.05)
-	amount = clampi(base_amount, 8, 60)
-
-	restart()
-	emitting = true
-	if not is_inside_tree():
-		await tree_entered
-	await get_tree().create_timer(lifetime + 0.02).timeout

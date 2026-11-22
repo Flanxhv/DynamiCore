@@ -240,11 +240,13 @@ text = "
 DynamiCore is a non-commercial project.
 Thank you for playing!
 
-Authorized Songs and Artworks:
+Authorized Songs:
 
 1.Rain then clear
 Composer: kuro (X: @taikokuro96)
-Illustrator : me"
+
+2.陽当たりの道しるべ
+Composer: NAMV (X: @nama_goma_)"
 label_settings = SubResource("LabelSettings_bopfr")
 autowrap_mode = 3
 

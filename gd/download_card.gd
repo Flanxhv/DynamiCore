@@ -1,4 +1,4 @@
-extends ColorRect
+extends TextureRect
 
 @onready var title_label = $TitleLabel
 @onready var artist_label = $ArtistLabel

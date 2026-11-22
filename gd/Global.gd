@@ -22,6 +22,19 @@ var song_list: Array = [
 		"difficulty": ["MEGA 13"],
 		"ranked": false,
 		"loved": false
+	},
+	{
+		"id": "base_song_04",
+		"title": "陽当たりの道しるべ",
+		"artist": "NAMV",
+		"charter": "flanxhv\n*Song copyright is held by the artist, and used in this game with permission.",
+		"folder_path": "res://built_in_songs/base_4/",
+		"audio_path": "res://built_in_songs/base_4/music.mp3",
+		"preview_path": "res://built_in_songs/base_4/music.mp3",
+		"cover_path": "res://built_in_songs/base_4/cover.png",
+		"difficulty": ["GIGA 14"],
+		"ranked": false,
+		"loved": false
 	}
 ]
 var auto_play: bool = false
